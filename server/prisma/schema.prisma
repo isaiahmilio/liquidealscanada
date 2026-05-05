@@ -10,7 +10,7 @@ generator client {
 // To switch to Postgres for production: change `provider` to "postgresql" and
 // rerun `prisma migrate dev`. The model definitions below are provider-agnostic.
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

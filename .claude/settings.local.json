@@ -16,7 +16,14 @@
       "PowerShell(Stop-Process *)",
       "PowerShell(Invoke-RestMethod -Uri \"http://localhost:4000/api/health\" -Method Get)",
       "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; Set-Location \"C:\\\\.programs\\\\liquidealscanada\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" --workspace server run db:seed)",
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\Git\\\\cmd;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; git remote -v)",
+      "PowerShell(gh repo *)",
+      "PowerShell(gh auth *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(git push *)",
+      "PowerShell(git add *)"
     ]
   }
 }

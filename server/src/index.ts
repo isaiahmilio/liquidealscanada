@@ -12,23 +12,23 @@ import { attachUser } from './middleware/requireAuth.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
+const IS_PROD = process.env.NODE_ENV === 'production';
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
 const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR ?? './uploads');
 
-app.use(cors({ origin: CLIENT_ORIGIN, credentials: true }));
+// In production the React app is served from this same server (same origin),
+// so CORS is only needed in development.
+app.use(cors({ origin: IS_PROD ? false : CLIENT_ORIGIN, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 app.use(attachUser);
 
-// Serve uploaded images statically. Path matches storage.publicUrl().
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() });
 });
 
-// Cost guardrail: limit listing creations + AI calls to 20/hour per IP.
-// Prevents a runaway client from burning the OpenAI/SerpAPI budget.
 const aiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 20,
@@ -43,6 +43,15 @@ app.use('/api/seller', sellerListingsRouter);
 app.use('/api/ai', aiLimiter, aiRouter);
 app.use('/api/pricing', pricingRouter);
 
+// Serve the React SPA in production. Must come after all API routes.
+if (IS_PROD) {
+  const clientDist = path.resolve(process.cwd(), 'client/dist');
+  app.use(express.static(clientDist));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
+
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
   if (err.message?.includes('Only JPEG')) {
@@ -55,4 +64,5 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 app.listen(PORT, () => {
   console.log(`[server] listening on http://localhost:${PORT}`);
   console.log(`[server] uploads served from ${UPLOAD_DIR}`);
+  if (IS_PROD) console.log('[server] serving React build from client/dist');
 });
