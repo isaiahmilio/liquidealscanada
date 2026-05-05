@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Test-Path \"C:\\\\.programs\\\\liquidealscanada\"; \\(Get-Item \"C:\\\\.programs\\\\liquidealscanada\"\\).GetFileSystemInfos\\(\\).Count)",
+      "PowerShell(cmd /c dir \"C:\\\\.programs\\\\liquidealscanada\" /a)",
+      "PowerShell(npm install *)",
+      "PowerShell(winget install *)",
+      "PowerShell(Test-NetConnection *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell($machine = [Environment]::GetEnvironmentVariable\\('PATH', 'Machine'\\); $user = [Environment]::GetEnvironmentVariable\\('PATH', 'User'\\); $env:PATH = \"$machine;$user\"; Set-Location \"C:\\\\.programs\\\\liquidealscanada\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run dev 2>&1)",
+      "PowerShell(Start-Sleep -Seconds 12; try { \\(Invoke-WebRequest -Uri http://localhost:4000/api/health -UseBasicParsing -TimeoutSec 5\\).Content } catch { \"not up yet\" })",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://localhost:4000/api/pricing/lookup?q=Meta+Quest+3S\" -UseBasicParsing -TimeoutSec 15\\).Content } catch { \"fail: $_\" })",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(netstat *)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:4000/api/health\" -Method Get)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; Set-Location \"C:\\\\.programs\\\\liquidealscanada\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" --workspace server run db:seed)",
+      "PowerShell(git *)"
+    ]
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "comment": "Static fallback pricing data when SerpAPI is unavailable or returns no results. Keywords are matched case-insensitively against the AI-identified product name.",
+  "products": [
+    {
+      "keywords": ["meta quest 3s", "quest 3s", "oculus quest 3s"],
+      "prices": [
+        { "retailer": "bestbuy.ca",  "priceCents": 49999, "url": null },
+        { "retailer": "amazon.ca",   "priceCents": 49999, "url": null },
+        { "retailer": "walmart.ca",  "priceCents": 49999, "url": null }
+      ]
+    },
+    {
+      "keywords": ["meta quest 3", "quest 3", "oculus quest 3"],
+      "prices": [
+        { "retailer": "bestbuy.ca",  "priceCents": 64999, "url": null },
+        { "retailer": "amazon.ca",   "priceCents": 64999, "url": null },
+        { "retailer": "walmart.ca",  "priceCents": 64999, "url": null }
+      ]
+    },
+    {
+      "keywords": ["meta quest 2", "quest 2", "oculus quest 2"],
+      "prices": [
+        { "retailer": "bestbuy.ca",  "priceCents": 24999, "url": null },
+        { "retailer": "amazon.ca",   "priceCents": 24999, "url": null },
+        { "retailer": "walmart.ca",  "priceCents": 24999, "url": null }
+      ]
+    },
+    {
+      "keywords": ["airpods", "apple airpods"],
+      "prices": [
+        { "retailer": "amazon.ca",       "priceCents": 19999, "url": "https://www.amazon.ca/s?k=airpods" },
+        { "retailer": "bestbuy.ca",      "priceCents": 21999, "url": "https://www.bestbuy.ca" },
+        { "retailer": "walmart.ca",      "priceCents": 19999, "url": "https://www.walmart.ca" }
+      ]
+    },
+    {
+      "keywords": ["instant pot", "pressure cooker"],
+      "prices": [
+        { "retailer": "amazon.ca",       "priceCents": 12999, "url": null },
+        { "retailer": "walmart.ca",      "priceCents": 13999, "url": null },
+        { "retailer": "canadiantire.ca", "priceCents": 14999, "url": null }
+      ]
+    },
+    {
+      "keywords": ["nintendo switch", "switch console"],
+      "prices": [
+        { "retailer": "bestbuy.ca",      "priceCents": 39999, "url": null },
+        { "retailer": "walmart.ca",      "priceCents": 39999, "url": null },
+        { "retailer": "amazon.ca",       "priceCents": 41999, "url": null }
+      ]
+    },
+    {
+      "keywords": ["dyson v8", "dyson cordless vacuum"],
+      "prices": [
+        { "retailer": "bestbuy.ca",  "priceCents": 49999, "url": null },
+        { "retailer": "amazon.ca",   "priceCents": 49999, "url": null },
+        { "retailer": "walmart.ca",  "priceCents": 46999, "url": null }
+      ]
+    },
+    {
+      "keywords": ["keurig", "k-cup brewer", "coffee maker"],
+      "prices": [
+        { "retailer": "canadiantire.ca", "priceCents": 9999,  "url": null },
+        { "retailer": "walmart.ca",      "priceCents": 8999,  "url": null },
+        { "retailer": "amazon.ca",       "priceCents": 9499,  "url": null }
+      ]
+    },
+    {
+      "keywords": ["lego"],
+      "prices": [
+        { "retailer": "amazon.ca",       "priceCents": 4999,  "url": null },
+        { "retailer": "walmart.ca",      "priceCents": 4799,  "url": null },
+        { "retailer": "canadiantire.ca", "priceCents": 5499,  "url": null }
+      ]
+    }
+  ],
+  "default": {
+    "comment": "Used when no keyword matches. Conservative average; users will manually adjust.",
+    "prices": [
+      { "retailer": "amazon.ca",  "priceCents": 4999, "url": null },
+      { "retailer": "walmart.ca", "priceCents": 5499, "url": null }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# prisma / sqlite
+*.db
+*.db-journal
+server/prisma/migrations/dev/
+
+# uploads (local image storage)
+server/uploads/
+
+# editor
+.vscode/
+.idea/
+*.swp

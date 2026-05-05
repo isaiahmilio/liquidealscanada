@@ -1,0 +1,68 @@
+// Prisma schema for LiquiDealsCanada
+// dev: SQLite, prod: PostgreSQL — toggled via DB_PROVIDER env var.
+// Enums are modeled as String + app-layer zod validation because SQLite
+// does not support native Prisma enums and we want one schema for both.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// To switch to Postgres for production: change `provider` to "postgresql" and
+// rerun `prisma migrate dev`. The model definitions below are provider-agnostic.
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         String    @default("BUYER") // BUYER | SELLER | BOTH
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  listings     Listing[]
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Listing {
+  id                  String        @id @default(cuid())
+  sellerId            String
+  title               String
+  description         String?
+  category            String?
+  photoPath           String?
+  retailPriceCents    Int           @default(0)
+  suggestedPriceCents Int           @default(0)
+  listedPriceCents    Int           @default(0)
+  costCents           Int           @default(0)
+  identifiedProduct   String?
+  status              String        @default("DRAFT") // DRAFT | LIVE | SOLD | REMOVED
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  seller              User          @relation(fields: [sellerId], references: [id])
+  priceSources        PriceSource[]
+
+  @@index([status, createdAt])
+  @@index([sellerId])
+}
+
+model PriceSource {
+  id         String   @id @default(cuid())
+  listingId  String
+  retailer   String
+  priceCents Int
+  url        String?
+  fetchedAt  DateTime @default(now())
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
