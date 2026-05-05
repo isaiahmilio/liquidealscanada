@@ -3,7 +3,11 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import rateLimit from 'express-rate-limit';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
 import { authRouter } from './routes/auth.js';
 import { listingsRouter, sellerListingsRouter } from './routes/listings.js';
 import { aiRouter } from './routes/ai.js';
@@ -45,7 +49,7 @@ app.use('/api/pricing', pricingRouter);
 
 // Serve the React SPA in production. Must come after all API routes.
 if (IS_PROD) {
-  const clientDist = path.resolve(process.cwd(), 'client/dist');
+  const clientDist = path.resolve(__dirname, '../../client/dist');
   app.use(express.static(clientDist));
   app.get('*', (_req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
