@@ -64,7 +64,7 @@ export function EditListing() {
       {error && <p className="text-red-600">{error}</p>}
 
       <div className="flex gap-4 bg-white rounded-lg border border-slate-200 p-4">
-        <img src={listing.photoUrl} alt="" className="w-32 h-32 object-cover rounded" />
+        <img src={listing.photoUrl ?? undefined} alt="" className="w-32 h-32 object-cover rounded" />
         <div className="flex-1 text-sm text-slate-600">
           <p>Status: <strong>{listing.status}</strong></p>
           <p>Retail avg: {formatCents(listing.retailPriceCents)}</p>

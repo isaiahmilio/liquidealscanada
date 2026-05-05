@@ -202,7 +202,7 @@ function PriceStep({
   return (
     <div className="space-y-6">
       <div className="flex gap-4 bg-white rounded-lg border border-slate-200 p-4">
-        <img src={listing.photoUrl} alt="" className="w-32 h-32 object-cover rounded" />
+        <img src={listing.photoUrl ?? undefined} alt="" className="w-32 h-32 object-cover rounded" />
         <div className="flex-1">
           <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold">AI identified</p>
           <h2 className="text-lg font-medium">{listing.identifiedProduct ?? 'Unknown item'}</h2>
