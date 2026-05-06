@@ -10,6 +10,7 @@ import { formatCents } from '../../lib/pricing';
 import { ManualListing } from './ManualListing';
 
 type Mode = 'auto' | 'manual';
+type Condition = 'New' | 'Like New' | 'Used' | '';
 
 interface CreateResponse {
   listing: OwnerListing;
@@ -35,6 +36,7 @@ export function NewListing() {
   const [category, setCategory]       = useState('');
   const [cost, setCost]               = useState(0);
   const [listed, setListed]           = useState(0);
+  const [condition, setCondition]     = useState<Condition>('');
   const [publishing, setPublishing]   = useState(false);
 
   if (loading) return <p className="text-slate-500">Loading…</p>;
@@ -89,6 +91,7 @@ export function NewListing() {
         title,
         description,
         category,
+        condition: condition || undefined,
         costCents:        Math.round(cost * 100),
         listedPriceCents: Math.round(listed * 100),
         status:           'LIVE',
@@ -229,13 +232,31 @@ export function NewListing() {
             </label>
           </div>
 
+          <div>
+            <span className="text-sm font-medium text-slate-700">Condition</span>
+            <div className="flex gap-2 mt-1.5">
+              {(['New', 'Like New', 'Used'] as Condition[]).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCondition(condition === c ? '' : c)}
+                  className={`flex-1 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                    condition === c
+                      ? 'bg-maple-500 border-maple-500 text-white'
+                      : 'border-slate-300 text-slate-600 hover:border-maple-300 hover:text-maple-600'
+                  }`}
+                >{c}</button>
+              ))}
+            </div>
+          </div>
+
           <label className="block">
             <span className="text-sm font-medium text-slate-700">Description <span className="text-slate-400 font-normal">(optional)</span></span>
             <textarea
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Condition, included accessories, any defects…"
+              placeholder="Included accessories, any defects…"
               className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500 resize-none"
             />
           </label>

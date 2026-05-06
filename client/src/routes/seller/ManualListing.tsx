@@ -48,13 +48,11 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
     setError(null);
     setSaving(true);
     try {
-      const condText = conditionText();
-      const fullDescription = [condText ? `Condition: ${condText}` : '', description].filter(Boolean).join('\n\n');
-
       const fd = new FormData();
       fd.append('title', title.trim());
-      if (fullDescription) fd.append('description', fullDescription);
-      if (category)         fd.append('category', category);
+      if (description.trim()) fd.append('description', description.trim());
+      if (category)           fd.append('category', category);
+      if (condition)          fd.append('condition', conditionText());
       fd.append('costCents',        String(costCents));
       fd.append('retailPriceCents', String(retailCents));
       fd.append('listedPriceCents', String(listedCents));

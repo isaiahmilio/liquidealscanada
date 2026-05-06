@@ -16,6 +16,7 @@ export interface PublicListing {
   retailPriceCents: number;
   listedPriceCents: number;
   identifiedProduct: string | null;
+  condition: string | null;
   status: 'DRAFT' | 'LIVE' | 'SOLD' | 'REMOVED';
   createdAt: string;
   updatedAt: string;

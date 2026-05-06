@@ -33,6 +33,7 @@ export function EditListing() {
   const [title, setTitle]             = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory]       = useState('');
+  const [condition, setCondition]     = useState('');
   const [cost, setCost]               = useState(0);
   const [listed, setListed]           = useState(0);
 
@@ -41,6 +42,7 @@ export function EditListing() {
     setTitle(data.listing.title);
     setDescription(data.listing.description ?? '');
     setCategory(data.listing.category ?? '');
+    setCondition(data.listing.condition ?? '');
     setCost(data.listing.costCents / 100);
     setListed(data.listing.listedPriceCents / 100);
   }, [data]);
@@ -66,7 +68,7 @@ export function EditListing() {
   }
 
   async function saveAll() {
-    await save({ title, description, category, costCents, listedPriceCents: listedCents });
+    await save({ title, description, category, condition: condition || undefined, costCents, listedPriceCents: listedCents });
   }
 
   async function setStatus(status: OwnerListing['status']) {
@@ -132,6 +134,24 @@ export function EditListing() {
             {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </label>
+
+        <div>
+          <span className="text-sm font-medium text-slate-700">Condition</span>
+          <div className="flex gap-2 mt-1.5">
+            {['New', 'Like New', 'Used'].map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCondition(condition === c ? '' : c)}
+                className={`flex-1 py-2 rounded-xl border text-sm font-medium transition-colors ${
+                  condition === c
+                    ? 'bg-maple-500 border-maple-500 text-white'
+                    : 'border-slate-300 text-slate-600 hover:border-maple-300 hover:text-maple-600'
+                }`}
+              >{c}</button>
+            ))}
+          </div>
+        </div>
 
         <label className="block">
           <span className="text-sm font-medium text-slate-700">Description</span>

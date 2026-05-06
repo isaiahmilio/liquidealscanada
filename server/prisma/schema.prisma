@@ -46,6 +46,7 @@ model Listing {
   listedPriceCents    Int           @default(0)
   costCents           Int           @default(0)
   identifiedProduct   String?
+  condition           String?       // e.g. "New", "Like New — 8/10", "Used — 5/10"
   status              String        @default("DRAFT") // DRAFT | LIVE | SOLD | REMOVED
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt

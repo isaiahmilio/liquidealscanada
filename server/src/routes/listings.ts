@@ -37,6 +37,7 @@ interface ListingWithSources {
   listedPriceCents: number;
   costCents: number;
   identifiedProduct: string | null;
+  condition: string | null;
   status: string;
   createdAt: Date;
   updatedAt: Date;
@@ -56,6 +57,7 @@ function serializeListing(listing: ListingWithSources, viewerId: string | undefi
     retailPriceCents: listing.retailPriceCents,
     listedPriceCents: listing.listedPriceCents,
     identifiedProduct: listing.identifiedProduct,
+    condition: listing.condition,
     status: listing.status,
     createdAt: listing.createdAt,
     updatedAt: listing.updatedAt,
@@ -169,7 +171,7 @@ sellerListingsRouter.get('/listings', requireAuth, requireSeller, async (req, re
 // POST /api/seller/listings/manual — create a listing manually with optional image, no AI.
 sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload.single('image'), async (req, res, next) => {
   try {
-    const { title, description, category, costCents, retailPriceCents, listedPriceCents } = req.body;
+    const { title, description, category, condition, costCents, retailPriceCents, listedPriceCents } = req.body;
     if (!title || typeof title !== 'string' || !title.trim()) {
       return res.status(400).json({ error: 'title is required' });
     }
@@ -185,6 +187,7 @@ sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload
         title:               title.trim(),
         description:         description ? String(description).trim() : null,
         category:            category    ? String(category).trim()    : null,
+        condition:           condition   ? String(condition).trim()   : null,
         costCents:           cost,
         retailPriceCents:    retail,
         suggestedPriceCents: Math.round(retail * 0.6),

@@ -20,6 +20,7 @@ export const listingUpdateSchema = z.object({
   title:            z.string().min(1).max(200).optional(),
   description:      z.string().max(5000).optional(),
   category:         z.string().max(100).optional(),
+  condition:        z.string().max(50).optional(),
   costCents:        z.number().int().min(0).max(10_000_000).optional(),
   listedPriceCents: z.number().int().min(0).max(10_000_000).optional(),
   status:           ListingStatus.optional(),
