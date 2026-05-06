@@ -18,6 +18,7 @@ export function ListingDetail() {
     queryFn: () => api.get<{ listing: PublicListing | OwnerListing }>(`/api/listings/${id}`),
     enabled: !!id,
   });
+  const [copied, setCopied] = useState(false);
 
   if (isLoading) {
     return (
@@ -51,7 +52,6 @@ export function ListingDetail() {
   const isOwner = user?.id === listing.sellerId;
   const ownerListing = isOwner ? (listing as OwnerListing) : null;
 
-  const [copied, setCopied] = useState(false);
   function share() {
     const url = window.location.href;
     if (navigator.share) {
