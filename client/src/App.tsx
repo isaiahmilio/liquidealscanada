@@ -8,6 +8,7 @@ import { SellerDashboard } from './routes/seller/Dashboard';
 import { NewListing } from './routes/seller/NewListing';
 import { EditListing } from './routes/seller/EditListing';
 import { RequireSeller } from './components/RequireSeller';
+import { Favorites } from './routes/Favorites';
 import { useAuth } from './lib/auth';
 
 const TICKER_ITEMS = [
@@ -62,6 +63,11 @@ export function App() {
           <nav className="flex items-center gap-5">
             <NavLink to="/" end className={navLinkClass}>Browse</NavLink>
             <NavLink to="/search" className={navLinkClass}>Search</NavLink>
+            {user && (
+              <NavLink to="/saved" className={navLinkClass}>
+                Saved
+              </NavLink>
+            )}
             {isSeller && (
               <NavLink to="/seller" className={navLinkClass}>My Listings</NavLink>
             )}
@@ -113,6 +119,9 @@ export function App() {
           } />
           <Route path="/listings/:id" element={
             <div className="max-w-6xl mx-auto px-4 py-8"><ListingDetail /></div>
+          } />
+          <Route path="/saved" element={
+            <div className="max-w-6xl mx-auto px-4 py-8"><Favorites /></div>
           } />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />

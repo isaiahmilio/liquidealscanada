@@ -1,11 +1,11 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { formatCents, savingsPercent } from '../lib/pricing';
 import type { PublicListing, OwnerListing } from '../lib/types';
 import { useAuth } from '../lib/auth';
 import { ProfitMarginBadge } from '../components/ProfitMarginBadge';
-import { Link } from 'react-router-dom';
+import { FavoriteButton } from '../components/FavoriteButton';
 
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>();
@@ -89,7 +89,10 @@ export function ListingDetail() {
                 </span>
               )}
             </div>
+            <div className="flex items-start justify-between gap-3">
             <h1 className="text-3xl font-bold text-slate-900 leading-tight">{listing.title}</h1>
+            <FavoriteButton listingId={listing.id} className="flex-shrink-0 mt-1" />
+          </div>
           </div>
 
           <div className="flex items-baseline gap-3">

@@ -12,6 +12,7 @@ import { authRouter } from './routes/auth.js';
 import { listingsRouter, sellerListingsRouter } from './routes/listings.js';
 import { aiRouter } from './routes/ai.js';
 import { pricingRouter } from './routes/pricing.js';
+import { favoritesRouter } from './routes/favorites.js';
 import { attachUser } from './middleware/requireAuth.js';
 import { runSeed } from './lib/seed.js';
 
@@ -48,6 +49,7 @@ app.use('/api/listings', aiLimiter, listingsRouter);
 app.use('/api/seller', sellerListingsRouter);
 app.use('/api/ai', aiLimiter, aiRouter);
 app.use('/api/pricing', pricingRouter);
+app.use('/api/favorites', favoritesRouter);
 
 // Serve the React SPA in production. Must come after all API routes.
 if (IS_PROD) {

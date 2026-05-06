@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { formatCents, savingsPercent } from '../lib/pricing';
 import type { PublicListing } from '../lib/types';
+import { FavoriteButton } from './FavoriteButton';
 
 export function ListingCard({ listing }: { listing: PublicListing }) {
   const savings = savingsPercent(listing.retailPriceCents, listing.listedPriceCents);
@@ -43,6 +44,8 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
             HOT
           </span>
         )}
+
+        <FavoriteButton listingId={listing.id} className="absolute bottom-2 right-2" />
       </div>
 
       <div className="p-3 flex flex-col gap-1">
