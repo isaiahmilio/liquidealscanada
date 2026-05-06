@@ -13,6 +13,7 @@ import { listingsRouter, sellerListingsRouter } from './routes/listings.js';
 import { aiRouter } from './routes/ai.js';
 import { pricingRouter } from './routes/pricing.js';
 import { attachUser } from './middleware/requireAuth.js';
+import { runSeed } from './lib/seed.js';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 4000);
@@ -69,4 +70,5 @@ app.listen(PORT, () => {
   console.log(`[server] listening on http://localhost:${PORT}`);
   console.log(`[server] uploads served from ${UPLOAD_DIR}`);
   if (IS_PROD) console.log('[server] serving React build from client/dist');
+  runSeed();
 });

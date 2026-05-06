@@ -23,7 +23,18 @@
       "PowerShell(Test-Path *)",
       "PowerShell(Get-ChildItem *)",
       "PowerShell(git push *)",
-      "PowerShell(git add *)"
+      "PowerShell(git add *)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run build 2>&1)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\\\\server\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run build 2>&1)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\\\\client\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run build 2>&1)",
+      "PowerShell(curl *)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://server-production-56ac.up.railway.app/api/health\" -UseBasicParsing | Select-Object StatusCode, Content)",
+      "WebFetch(domain:server-production-56ac.up.railway.app)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" install -g @railway/cli)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"C:\\\\Program Files\\\\nodejs\\\\node.exe\" \"C:\\\\Program Files\\\\nodejs\\\\node_modules\\\\@railway\\\\cli\\\\bin\\\\railway.js\" whoami)",
+      "PowerShell(cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" whoami)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" whoami)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" login --browserless)"
     ]
   }
 }
