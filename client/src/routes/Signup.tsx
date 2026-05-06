@@ -30,7 +30,7 @@ export function Signup() {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🎉</div>
           <h1 className="text-2xl font-bold text-slate-900">Join LiquiDealsCanada</h1>
-          <p className="text-slate-500 text-sm mt-1">Get access to liquidation deals from coast to coast</p>
+          <p className="text-slate-500 text-sm mt-1">Get access to deals up to 90% off</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
