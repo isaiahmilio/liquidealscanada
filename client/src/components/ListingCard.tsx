@@ -55,8 +55,6 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
           </span>
         )}
 
-        <FavoriteButton listingId={listing.id} className="absolute bottom-2 right-2 z-10" />
-
         {/* Hover preview — desktop only */}
         {(listing.condition || listing.description) && (
           <div className="hidden md:flex pointer-events-none absolute inset-x-0 bottom-0 flex-col gap-1.5 px-3 py-3 bg-gradient-to-t from-black/75 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out">
@@ -90,11 +88,14 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
           )}
         </div>
 
-        {listing.category && (
-          <span className="self-start text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full mt-0.5">
-            {listing.category}
-          </span>
-        )}
+        <div className="flex items-center justify-between mt-0.5">
+          {listing.category ? (
+            <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+              {listing.category}
+            </span>
+          ) : <span />}
+          <FavoriteButton listingId={listing.id} />
+        </div>
       </div>
     </Link>
   );
