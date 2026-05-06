@@ -8,6 +8,7 @@ import { PricePresetButtons } from '../../components/PricePresetButtons';
 import { ProfitMarginBadge } from '../../components/ProfitMarginBadge';
 import { formatCents } from '../../lib/pricing';
 import { ManualListing } from './ManualListing';
+import { useToast } from '../../lib/toast';
 
 type Mode = 'auto' | 'manual';
 type Condition = 'Brand New' | 'Like New' | 'Used' | '';
@@ -23,9 +24,9 @@ export function NewListing() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
 
+  const toast = useToast();
   const [mode, setMode]         = useState<Mode>('manual');
   const [analyzing, setAnalyzing] = useState(false);
-  const [error, setError]       = useState<string | null>(null);
   const [listing, setListing]   = useState<OwnerListing | null>(null);
   const [aiSource, setAiSource] = useState<'serpapi' | 'static' | 'none'>('none');
   const [productHint, setProductHint] = useState('');
@@ -61,7 +62,6 @@ export function NewListing() {
   }
 
   async function uploadPhoto(file: File) {
-    setError(null);
     setAnalyzing(true);
     try {
       const fd = new FormData();
@@ -77,7 +77,7 @@ export function NewListing() {
       setCost(l.costCents / 100);
       setListed(l.listedPriceCents / 100);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Upload failed');
+      toast.error(err instanceof ApiError ? err.message : 'Upload failed');
     } finally {
       setAnalyzing(false);
     }
@@ -86,7 +86,6 @@ export function NewListing() {
   async function publish() {
     if (!listing) return;
     setPublishing(true);
-    setError(null);
     try {
       await api.patch(`/api/listings/${listing.id}`, {
         title,
@@ -98,9 +97,10 @@ export function NewListing() {
         listedPriceCents: Math.round(listed * 100),
         status:           'LIVE',
       });
+      toast.success('Listing published');
       nav('/seller');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Publish failed');
+      toast.error(err instanceof ApiError ? err.message : 'Publish failed');
       setPublishing(false);
     }
   }
@@ -142,9 +142,6 @@ export function NewListing() {
             </div>
           )}
 
-          {error && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">⚠️ {error}</p>
-          )}
         </div>
 
         <p className="text-center text-sm text-slate-400 mt-5">
@@ -169,10 +166,6 @@ export function NewListing() {
         </div>
         <Link to="/seller" className="text-sm text-slate-400 hover:text-slate-700">Cancel</Link>
       </div>
-
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-4">⚠️ {error}</p>
-      )}
 
       <div className="space-y-4">
         {/* Photo + retail info */}

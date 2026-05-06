@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { useToast } from '../lib/toast';
 
 interface FavoriteEntry { listingId: string }
 interface FavoritesResponse { favorites: FavoriteEntry[] }
@@ -8,6 +9,7 @@ interface FavoritesResponse { favorites: FavoriteEntry[] }
 export function useFavorites() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const toast = useToast();
 
   const { data } = useQuery({
     queryKey: ['favorites'],
@@ -37,10 +39,16 @@ export function useFavorites() {
     },
     onError: (_err, _id, ctx) => {
       if (ctx?.prev) qc.setQueryData(['favorites'], ctx.prev);
+      toast.error('Could not update saved items');
     },
-    onSettled: (_data, _err, listingId) => {
+    onSettled: (_data, err, listingId) => {
       qc.invalidateQueries({ queryKey: ['favorites'] });
       qc.invalidateQueries({ queryKey: ['listing', listingId] });
+      if (!err) {
+        const current = qc.getQueryData<{ favorites: { listingId: string }[] }>(['favorites']);
+        const nowSaved = current?.favorites.some((f) => f.listingId === listingId);
+        toast.success(nowSaved ? 'Saved!' : 'Removed from saved');
+      }
     },
   });
 

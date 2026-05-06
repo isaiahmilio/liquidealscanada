@@ -7,6 +7,7 @@ import type { OwnerListing } from '../../lib/types';
 import { PricePresetButtons } from '../../components/PricePresetButtons';
 import { ProfitMarginBadge } from '../../components/ProfitMarginBadge';
 import { formatCents } from '../../lib/pricing';
+import { useToast } from '../../lib/toast';
 
 const CATEGORIES = ['Electronics', 'Gaming', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
 
@@ -21,9 +22,9 @@ export function EditListing() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
   const qc = useQueryClient();
-  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
+  const toast = useToast();
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   const { data, isLoading } = useQuery({
@@ -65,7 +66,7 @@ export function EditListing() {
       await api.patch(`/api/listings/${id}`, patch);
       qc.invalidateQueries({ queryKey: ['seller', 'listings'] });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Save failed');
+      toast.error(err instanceof ApiError ? err.message : 'Save failed');
     } finally {
       setSaving(false);
     }
@@ -73,10 +74,14 @@ export function EditListing() {
 
   async function saveAll() {
     await save({ title, description, category, condition: condition || undefined, quantity, costCents, listedPriceCents: listedCents });
+    toast.success('Changes saved');
   }
 
   async function setStatus(status: OwnerListing['status']) {
     await save({ status });
+    if (status === 'LIVE')    toast.success('Listing published');
+    if (status === 'SOLD')    toast.success('Marked as sold');
+    if (status === 'REMOVED') toast.success('Listing removed');
     nav('/seller');
   }
 
@@ -87,8 +92,9 @@ export function EditListing() {
       fd.append('image', file);
       await api.post(`/api/listings/${id}/photos`, fd);
       qc.invalidateQueries({ queryKey: ['listing', id, 'owner'] });
+      toast.success('Photo added');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Photo upload failed');
+      toast.error(err instanceof ApiError ? err.message : 'Photo upload failed');
     } finally {
       setPhotoUploading(false);
     }
@@ -98,8 +104,9 @@ export function EditListing() {
     try {
       await api.del(`/api/listings/${id}/photos/${photoId}`);
       qc.invalidateQueries({ queryKey: ['listing', id, 'owner'] });
+      toast.success('Photo removed');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Delete failed');
+      toast.error(err instanceof ApiError ? err.message : 'Delete failed');
     }
   }
 
@@ -118,10 +125,6 @@ export function EditListing() {
           {STATUS_LABEL[listing.status] ?? listing.status}
         </span>
       </div>
-
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">⚠️ {error}</p>
-      )}
 
       {/* Photos */}
       <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">

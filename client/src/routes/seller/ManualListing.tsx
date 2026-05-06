@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../lib/api';
 import type { OwnerListing } from '../../lib/types';
+import { useToast } from '../../lib/toast';
 import { ImageDropzone } from '../../components/ImageDropzone';
 import { PricePresetButtons } from '../../components/PricePresetButtons';
 import { ProfitMarginBadge } from '../../components/ProfitMarginBadge';
@@ -25,7 +26,7 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
   const [retail, setRetail]           = useState('');
   const [listed, setListed]           = useState('');
   const [saving, setSaving]           = useState(false);
-  const [error, setError]             = useState<string | null>(null);
+  const toast = useToast();
 
   const retailCents = Math.round((parseFloat(retail) || 0) * 100);
   const listedCents = Math.round((parseFloat(listed) || 0) * 100);
@@ -53,7 +54,6 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
   }
 
   async function publish() {
-    setError(null);
     setSaving(true);
     try {
       const fd = new FormData();
@@ -69,9 +69,10 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
 
       const res = await api.post<{ listing: OwnerListing }>('/api/seller/listings/manual', fd);
       await api.patch(`/api/listings/${res.listing.id}`, { status: 'LIVE' });
+      toast.success('Listing published');
       nav('/seller');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to create listing');
+      toast.error(err instanceof ApiError ? err.message : 'Failed to create listing');
     } finally {
       setSaving(false);
     }
@@ -79,10 +80,6 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="space-y-4">
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">⚠️ {error}</p>
-      )}
-
       {/* Photo + title */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Item info</p>
