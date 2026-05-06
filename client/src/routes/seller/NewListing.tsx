@@ -1,69 +1,53 @@
 import { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../lib/auth';
 import { api, ApiError } from '../../lib/api';
 import type { OwnerListing } from '../../lib/types';
 import { ImageDropzone } from '../../components/ImageDropzone';
 import { PricePresetButtons } from '../../components/PricePresetButtons';
 import { ProfitMarginBadge } from '../../components/ProfitMarginBadge';
-import { formatCents, savingsPercent } from '../../lib/pricing';
+import { formatCents } from '../../lib/pricing';
 import { ManualListing } from './ManualListing';
 
-type Mode = 'choose' | 'auto' | 'manual';
-type Step = 'photo' | 'price' | 'publish';
+type Mode = 'auto' | 'manual';
 
 interface CreateResponse {
   listing: OwnerListing;
   ai: { confidence: number; source: 'serpapi' | 'static' | 'none' };
 }
 
+const CATEGORIES = ['Electronics', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
+
 export function NewListing() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
 
-  const [mode, setMode]   = useState<Mode>('choose');
-  const [step, setStep]   = useState<Step>('photo');
+  const [mode, setMode]         = useState<Mode>('auto');
   const [analyzing, setAnalyzing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [listing, setListing] = useState<OwnerListing | null>(null);
+  const [error, setError]       = useState<string | null>(null);
+  const [listing, setListing]   = useState<OwnerListing | null>(null);
   const [aiSource, setAiSource] = useState<'serpapi' | 'static' | 'none'>('none');
   const [productHint, setProductHint] = useState('');
+
+  // Editable review fields (shown after AI)
+  const [title, setTitle]             = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory]       = useState('');
+  const [cost, setCost]               = useState(0);
+  const [listed, setListed]           = useState(0);
+  const [publishing, setPublishing]   = useState(false);
 
   if (loading) return <p className="text-slate-500">Loading…</p>;
   if (!user)   return <Navigate to="/login" replace />;
 
   if (mode === 'manual') {
     return (
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-6">List a new item</h1>
-        <ManualListing onBack={() => setMode('choose')} />
-      </div>
-    );
-  }
-
-  if (mode === 'choose') {
-    return (
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-2xl font-semibold mb-2">List a new item</h1>
-        <p className="text-slate-500 mb-8">How would you like to create your listing?</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            onClick={() => setMode('auto')}
-            className="text-left p-6 rounded-xl border-2 border-slate-200 hover:border-brand-500 hover:bg-brand-50 transition-colors"
-          >
-            <div className="text-2xl mb-3">AI</div>
-            <h2 className="font-semibold text-slate-900 mb-1">Automatic</h2>
-            <p className="text-sm text-slate-500">Upload a photo and AI identifies the product, looks up the retail price, and suggests a selling price.</p>
-          </button>
-          <button
-            onClick={() => setMode('manual')}
-            className="text-left p-6 rounded-xl border-2 border-slate-200 hover:border-brand-500 hover:bg-brand-50 transition-colors"
-          >
-            <div className="text-2xl mb-3">✏️</div>
-            <h2 className="font-semibold text-slate-900 mb-1">Manual</h2>
-            <p className="text-sm text-slate-500">Enter the product name, details, your cost, and retail price step by step. Full control over every field.</p>
-          </button>
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => setMode('auto')} className="text-slate-400 hover:text-slate-700 text-sm">← Back</button>
+          <h1 className="text-xl font-bold text-slate-900">Manual listing</h1>
         </div>
+        <ManualListing onBack={() => setMode('auto')} />
       </div>
     );
   }
@@ -76,9 +60,14 @@ export function NewListing() {
       fd.append('image', file);
       if (productHint.trim()) fd.append('productHint', productHint.trim());
       const res = await api.post<CreateResponse>('/api/listings', fd);
-      setListing(res.listing);
+      const l = res.listing;
+      setListing(l);
       setAiSource(res.ai.source);
-      setStep('price');
+      setTitle(l.title);
+      setDescription(l.description ?? '');
+      setCategory(l.category ?? '');
+      setCost(l.costCents / 100);
+      setListed(l.listedPriceCents / 100);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Upload failed');
     } finally {
@@ -86,38 +75,42 @@ export function NewListing() {
     }
   }
 
-  async function patchListing(patch: Partial<OwnerListing>) {
-    if (!listing) return;
-    try {
-      const res = await api.patch<{ listing: OwnerListing }>(`/api/listings/${listing.id}`, patch);
-      setListing(res.listing);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Save failed');
-    }
-  }
-
   async function publish() {
     if (!listing) return;
+    setPublishing(true);
+    setError(null);
     try {
-      await api.patch(`/api/listings/${listing.id}`, { status: 'LIVE' });
+      await api.patch(`/api/listings/${listing.id}`, {
+        title,
+        description,
+        category,
+        costCents:        Math.round(cost * 100),
+        listedPriceCents: Math.round(listed * 100),
+        status:           'LIVE',
+      });
       nav('/seller');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Publish failed');
+      setPublishing(false);
     }
   }
 
-  return (
-    <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-2">List a new item</h1>
-      <Steps current={step} />
+  const listedCents = Math.round(listed * 100);
+  const costCents   = Math.round(cost * 100);
 
-      {error && <p className="text-red-600 mb-4">{error}</p>}
+  // Upload step
+  if (!listing) {
+    return (
+      <div className="max-w-lg mx-auto">
+        <div className="mb-6">
+          <h1 className="text-xl font-bold text-slate-900">New listing</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Upload a photo and AI will handle the rest</p>
+        </div>
 
-      {step === 'photo' && (
-        <div className="space-y-4">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
           <div>
-            <label className="block text-sm text-slate-600 mb-1">
-              Product name <span className="text-slate-400">(optional — helps AI be more accurate)</span>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Product name <span className="text-slate-400 font-normal">(optional — helps AI be more accurate)</span>
             </label>
             <input
               type="text"
@@ -125,228 +118,161 @@ export function NewListing() {
               value={productHint}
               onChange={(e) => setProductHint(e.target.value)}
               disabled={analyzing}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50"
+              className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500 disabled:opacity-50"
             />
           </div>
+
           <ImageDropzone onFileSelected={uploadPhoto} disabled={analyzing} />
+
           {analyzing && (
-            <div className="mt-6 text-center text-slate-500">
-              <p className="font-medium">Analyzing your photo…</p>
-              <p className="text-sm">Identifying the product and checking Canadian retailer prices.</p>
+            <div className="text-center py-4 text-slate-500">
+              <div className="text-2xl mb-2 animate-pulse">🤖</div>
+              <p className="font-medium text-sm">Analyzing your photo…</p>
+              <p className="text-xs text-slate-400 mt-0.5">Identifying product and checking Canadian retailer prices</p>
+            </div>
+          )}
+
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">⚠️ {error}</p>
+          )}
+        </div>
+
+        <p className="text-center text-sm text-slate-400 mt-5">
+          Prefer to enter details yourself?{' '}
+          <button onClick={() => setMode('manual')} className="text-maple-500 hover:underline font-medium">
+            Switch to manual entry
+          </button>
+        </p>
+      </div>
+    );
+  }
+
+  // Review + publish step (after AI)
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">Review & publish</h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {aiSource === 'serpapi' ? '✅ Live retail prices fetched' : aiSource === 'static' ? '📋 Reference prices used' : '📝 Review AI suggestions'}
+          </p>
+        </div>
+        <Link to="/seller" className="text-sm text-slate-400 hover:text-slate-700">Cancel</Link>
+      </div>
+
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-4">⚠️ {error}</p>
+      )}
+
+      <div className="space-y-4">
+        {/* Photo + retail info */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 flex gap-4 shadow-sm">
+          <img src={listing.photoUrl ?? undefined} alt="" className="w-24 h-24 object-cover rounded-xl flex-shrink-0 bg-slate-100" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">AI identified</p>
+            <p className="font-semibold text-slate-900 truncate">{listing.identifiedProduct ?? 'Unknown product'}</p>
+            <p className="text-sm text-slate-500 mt-0.5">Retail avg: <strong>{formatCents(listing.retailPriceCents)}</strong></p>
+            {listing.priceSources.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-1.5">
+                {listing.priceSources.slice(0, 3).map((s, i) => (
+                  <span key={i} className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
+                    {s.retailer} · {formatCents(s.priceCents)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Editable details */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Listing details</p>
+
+          <label className="block">
+            <span className="text-sm font-medium text-slate-700">Title</span>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+            />
+          </label>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="text-sm font-medium text-slate-700">Category</span>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500 bg-white"
+              >
+                <option value="">No category</option>
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-slate-700">Your cost (CAD) <span className="text-slate-400 font-normal text-xs">private</span></span>
+              <div className="relative mt-1.5">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+                <input
+                  type="number" step="0.01" min="0"
+                  value={cost}
+                  onChange={(e) => setCost(parseFloat(e.target.value) || 0)}
+                  className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+                />
+              </div>
+            </label>
+          </div>
+
+          <label className="block">
+            <span className="text-sm font-medium text-slate-700">Description <span className="text-slate-400 font-normal">(optional)</span></span>
+            <textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Condition, included accessories, any defects…"
+              className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500 resize-none"
+            />
+          </label>
+        </div>
+
+        {/* Pricing */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Your listing price</p>
+
+          <PricePresetButtons
+            retailCents={listing.retailPriceCents}
+            onPick={(c) => setListed(c / 100)}
+          />
+
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+            <input
+              type="number" step="0.01" min="0"
+              value={listed}
+              onChange={(e) => setListed(parseFloat(e.target.value) || 0)}
+              className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+            />
+          </div>
+
+          {listedCents > 0 && (
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <ProfitMarginBadge listedCents={listedCents} costCents={costCents} />
+              {listing.retailPriceCents > listedCents && (
+                <span className="text-sm text-slate-500">
+                  Buyers see <strong className="text-brand-700">{Math.round((1 - listedCents / listing.retailPriceCents) * 100)}% off</strong> retail
+                </span>
+              )}
             </div>
           )}
         </div>
-      )}
 
-      {step === 'price' && listing && (
-        <PriceStep
-          listing={listing}
-          aiSource={aiSource}
-          onChange={patchListing}
-          onNext={() => setStep('publish')}
-        />
-      )}
-
-      {step === 'publish' && listing && (
-        <PublishStep
-          listing={listing}
-          onChange={patchListing}
-          onPublish={publish}
-          onBack={() => setStep('price')}
-        />
-      )}
-    </div>
-  );
-}
-
-function Steps({ current }: { current: Step }) {
-  const steps: { key: Step; label: string }[] = [
-    { key: 'photo',   label: '1. Photo' },
-    { key: 'price',   label: '2. Price' },
-    { key: 'publish', label: '3. Publish' },
-  ];
-  const order: Step[] = ['photo', 'price', 'publish'];
-  const idx = order.indexOf(current);
-  return (
-    <ol className="flex gap-3 mb-8 text-sm">
-      {steps.map((s, i) => (
-        <li
-          key={s.key}
-          className={`px-3 py-1 rounded-full ${
-            i === idx ? 'bg-brand-600 text-white' :
-            i < idx   ? 'bg-brand-50 text-brand-700' :
-                        'bg-slate-100 text-slate-500'
-          }`}
-        >
-          {s.label}
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function PriceStep({
-  listing, aiSource, onChange, onNext,
-}: {
-  listing: OwnerListing;
-  aiSource: 'serpapi' | 'static' | 'none';
-  onChange: (patch: Partial<OwnerListing>) => void;
-  onNext: () => void;
-}) {
-  const [cost, setCost]     = useState(listing.costCents / 100);
-  const [listed, setListed] = useState(listing.listedPriceCents / 100);
-  const listedCents = Math.round(listed * 100);
-  const costCents   = Math.round(cost * 100);
-  const savings = savingsPercent(listing.retailPriceCents, listedCents);
-
-  return (
-    <div className="space-y-6">
-      <div className="flex gap-4 bg-white rounded-lg border border-slate-200 p-4">
-        <img src={listing.photoUrl ?? undefined} alt="" className="w-32 h-32 object-cover rounded" />
-        <div className="flex-1">
-          <p className="text-xs text-slate-500 uppercase tracking-wide font-semibold">AI identified</p>
-          <h2 className="text-lg font-medium">{listing.identifiedProduct ?? 'Unknown item'}</h2>
-          {listing.category && <p className="text-sm text-slate-500">Category: {listing.category}</p>}
-          <p className="mt-3 text-sm">
-            Retail price: <strong>{formatCents(listing.retailPriceCents)}</strong>{' '}
-            <span className="text-xs text-slate-400">
-              ({aiSource === 'serpapi' ? 'live' : aiSource === 'static' ? 'reference' : 'no data'})
-            </span>
-          </p>
-          {listing.priceSources.length > 0 && (
-            <ul className="mt-2 text-xs text-slate-500 space-y-0.5">
-              {listing.priceSources.slice(0, 4).map((s, i) => (
-                <li key={i}>
-                  {s.url ? (
-                    <a href={s.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-brand-600">
-                      {s.retailer}
-                    </a>
-                  ) : (
-                    s.retailer
-                  )}
-                  {' '}— {formatCents(s.priceCents)}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-
-      <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-4">
-        <div>
-          <label className="block">
-            <span className="text-sm text-slate-600">Your cost (CAD)</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={cost}
-              onChange={(e) => setCost(parseFloat(e.target.value) || 0)}
-              onBlur={() => onChange({ costCents })}
-              className="mt-1 block w-full rounded-md border-slate-300 border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
-          </label>
-          <p className="text-xs text-slate-400 mt-1">Only you can see this. Used to calculate your profit margin.</p>
-        </div>
-
-        <div>
-          <label className="block">
-            <span className="text-sm text-slate-600">Your listing price (CAD)</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={listed}
-              onChange={(e) => setListed(parseFloat(e.target.value) || 0)}
-              onBlur={() => onChange({ listedPriceCents: listedCents })}
-              className="mt-1 block w-full rounded-md border-slate-300 border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
-          </label>
-          <div className="mt-3">
-            <PricePresetButtons
-              retailCents={listing.retailPriceCents}
-              onPick={(c) => { setListed(c / 100); onChange({ listedPriceCents: c }); }}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100">
-          <ProfitMarginBadge listedCents={listedCents} costCents={costCents} />
-          <span className="text-sm text-slate-500">
-            Buyers will see {savings > 0 ? `${savings}% savings` : 'no discount'}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
         <button
-          onClick={onNext}
-          className="bg-brand-600 text-white px-4 py-2 rounded-md hover:bg-brand-700"
+          onClick={publish}
+          disabled={!title.trim() || listedCents <= 0 || publishing}
+          className="w-full bg-maple-500 text-white py-3 rounded-xl hover:bg-maple-600 font-semibold transition active:scale-[0.98] disabled:opacity-50 shadow-sm"
         >
-          Next: details &rarr;
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function PublishStep({
-  listing, onChange, onPublish, onBack,
-}: {
-  listing: OwnerListing;
-  onChange: (patch: Partial<OwnerListing>) => void;
-  onPublish: () => void;
-  onBack: () => void;
-}) {
-  const [title, setTitle]             = useState(listing.title);
-  const [description, setDescription] = useState(listing.description ?? '');
-  const [category, setCategory]       = useState(listing.category ?? '');
-
-  return (
-    <div className="space-y-4 bg-white rounded-lg border border-slate-200 p-4">
-      <label className="block">
-        <span className="text-sm text-slate-600">Title</span>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          onBlur={() => onChange({ title })}
-          className="mt-1 block w-full rounded-md border-slate-300 border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-sm text-slate-600">Description</span>
-        <textarea
-          rows={4}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          onBlur={() => onChange({ description })}
-          className="mt-1 block w-full rounded-md border-slate-300 border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        />
-      </label>
-
-      <label className="block">
-        <span className="text-sm text-slate-600">Category</span>
-        <input
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          onBlur={() => onChange({ category })}
-          className="mt-1 block w-full rounded-md border-slate-300 border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-        />
-      </label>
-
-      <div className="flex justify-between pt-2">
-        <button
-          onClick={onBack}
-          className="px-4 py-2 rounded-md border border-slate-300 hover:bg-slate-50"
-        >
-          &larr; Back
-        </button>
-        <button
-          onClick={onPublish}
-          className="bg-brand-600 text-white px-4 py-2 rounded-md hover:bg-brand-700"
-        >
-          Publish listing
+          {publishing ? 'Publishing…' : '🚀 Publish listing'}
         </button>
       </div>
     </div>
