@@ -56,6 +56,22 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
         )}
 
         <FavoriteButton listingId={listing.id} className="absolute bottom-2 right-2" />
+
+        {/* Hover preview — desktop only */}
+        {(listing.condition || listing.description) && (
+          <div className="hidden md:flex absolute inset-x-0 bottom-0 flex-col gap-1.5 px-3 py-3 bg-gradient-to-t from-black/75 via-black/40 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-200 ease-out">
+            {listing.condition && (
+              <span className="self-start text-[10px] font-semibold bg-white/20 text-white border border-white/30 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                {listing.condition}
+              </span>
+            )}
+            {listing.description && (
+              <p className="text-white text-xs leading-snug line-clamp-2 drop-shadow">
+                {listing.description}
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="p-3 flex flex-col gap-1">
