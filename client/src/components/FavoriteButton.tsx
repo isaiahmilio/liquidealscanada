@@ -26,7 +26,7 @@ export function FavoriteButton({
       className={`flex items-center justify-center w-8 h-8 rounded-full transition-all active:scale-90 ${
         active
           ? 'bg-red-50 text-red-500 hover:bg-red-100'
-          : 'bg-white/80 text-slate-400 hover:text-red-400 hover:bg-white'
+          : 'bg-slate-100 text-slate-400 hover:text-red-400 hover:bg-red-50'
       } shadow-sm backdrop-blur-sm ${className}`}
     >
       <svg
