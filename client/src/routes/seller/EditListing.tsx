@@ -200,6 +200,7 @@ export function EditListing() {
           <p className="text-xs text-slate-500 mb-2">Quick presets</p>
           <PricePresetButtons
             retailCents={listing.retailPriceCents}
+            selectedCents={listedCents}
             onPick={(c) => setListed(c / 100)}
           />
         </div>

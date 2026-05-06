@@ -227,6 +227,7 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
             <p className="text-xs text-slate-500 mb-2">Quick price presets</p>
             <PricePresetButtons
               retailCents={retailCents}
+              selectedCents={listedCents}
               onPick={(c) => setListed(String(c / 100))}
             />
           </div>

@@ -1,29 +1,47 @@
-import { formatCents, preset30, preset50, suggestedFromRetail } from '../lib/pricing';
+import { formatCents } from '../lib/pricing';
 
 interface Props {
   retailCents: number;
   onPick: (cents: number) => void;
+  selectedCents?: number;
 }
 
-export function PricePresetButtons({ retailCents, onPick }: Props) {
+const PRESETS = [
+  { offPct: 20, label: '20% off' },
+  { offPct: 30, label: '30% off' },
+  { offPct: 40, label: '40% off ★' },
+  { offPct: 50, label: '50% off' },
+  { offPct: 60, label: '60% off' },
+  { offPct: 70, label: '70% off' },
+  { offPct: 80, label: '80% off' },
+];
+
+export function PricePresetButtons({ retailCents, onPick, selectedCents }: Props) {
   if (retailCents <= 0) return null;
-  const presets = [
-    { label: 'Suggested (60%)', cents: suggestedFromRetail(retailCents) },
-    { label: '50% of retail',   cents: preset50(retailCents) },
-    { label: '30% of retail',   cents: preset30(retailCents) },
-  ];
+
   return (
     <div className="flex flex-wrap gap-2">
-      {presets.map((p) => (
-        <button
-          key={p.label}
-          type="button"
-          onClick={() => onPick(p.cents)}
-          className="text-sm px-3 py-1.5 rounded-md border border-slate-300 hover:border-brand-500 hover:bg-brand-50"
-        >
-          {p.label}: <strong>{formatCents(p.cents)}</strong>
-        </button>
-      ))}
+      {PRESETS.map((p) => {
+        const cents = Math.round(retailCents * (1 - p.offPct / 100));
+        const isActive = selectedCents !== undefined && Math.abs(selectedCents - cents) < 2;
+        return (
+          <button
+            key={p.offPct}
+            type="button"
+            onClick={() => onPick(cents)}
+            className={`flex flex-col items-center px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
+              isActive
+                ? 'bg-maple-500 border-maple-500 text-white shadow-sm'
+                : p.offPct === 40
+                ? 'border-brand-300 text-brand-700 bg-brand-50 hover:bg-brand-100'
+                : 'border-slate-200 text-slate-600 hover:border-maple-300 hover:bg-maple-50 hover:text-maple-700'
+            }`}
+          >
+            <span className="font-bold">{p.label}</span>
+            <span className="opacity-80">{formatCents(cents)}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }

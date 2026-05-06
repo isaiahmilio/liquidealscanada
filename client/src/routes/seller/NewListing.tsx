@@ -268,6 +268,7 @@ export function NewListing() {
 
           <PricePresetButtons
             retailCents={listing.retailPriceCents}
+            selectedCents={listedCents}
             onPick={(c) => setListed(c / 100)}
           />
 
