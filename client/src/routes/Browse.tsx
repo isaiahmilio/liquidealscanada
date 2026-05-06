@@ -12,17 +12,17 @@ export function Browse() {
   if (isLoading) {
     return (
       <div>
-        <div className="mb-6">
-          <div className="h-8 w-48 bg-slate-200 rounded animate-pulse mb-2" />
-          <div className="h-4 w-32 bg-slate-100 rounded animate-pulse" />
+        <div className="mb-8">
+          <div className="h-8 w-48 bg-slate-200 rounded-lg animate-pulse mb-2" />
+          <div className="h-4 w-36 bg-slate-200 rounded animate-pulse" />
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-slate-200 overflow-hidden">
-              <div className="aspect-square bg-slate-200 animate-pulse" />
+            <div key={i} className="rounded-xl border border-slate-200 overflow-hidden bg-white animate-pulse">
+              <div className="aspect-square bg-slate-200" />
               <div className="p-3 space-y-2">
-                <div className="h-4 bg-slate-200 rounded animate-pulse" />
-                <div className="h-5 w-20 bg-slate-200 rounded animate-pulse" />
+                <div className="h-4 bg-slate-200 rounded" />
+                <div className="h-5 w-20 bg-slate-200 rounded" />
               </div>
             </div>
           ))}
@@ -34,7 +34,8 @@ export function Browse() {
   if (error) {
     return (
       <div className="text-center py-16">
-        <p className="text-red-600 font-medium">Failed to load listings.</p>
+        <div className="text-5xl mb-4">⚠️</div>
+        <p className="text-red-600 font-semibold">Failed to load listings.</p>
         <p className="text-sm text-slate-400 mt-1">Please try refreshing the page.</p>
       </div>
     );
@@ -42,17 +43,17 @@ export function Browse() {
 
   if (!data || data.listings.length === 0) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-24 border-2 border-dashed border-slate-200 rounded-2xl bg-white">
         <div className="text-5xl mb-4">🏷️</div>
         <h1 className="text-2xl font-bold mb-2 text-slate-900">No deals yet</h1>
-        <p className="text-slate-500">Check back soon — new items are added every day.</p>
+        <p className="text-slate-500 max-w-sm mx-auto">Check back soon — new liquidation items are added every day across Canada.</p>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">Today's Deals</h1>
         <p className="text-sm text-slate-500 mt-0.5">
           {data.total} item{data.total === 1 ? '' : 's'} available across Canada
