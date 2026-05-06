@@ -193,13 +193,16 @@ export function Browse() {
 
         {!isLoading && filtered.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-4xl mb-3">🔍</div>
-            <p className="text-slate-600 font-medium">No results found{q ? ` for "${q}"` : ''}.</p>
+            <div className="text-4xl mb-3">{activeCategory ? '🏷️' : '🔍'}</div>
+            <p className="text-slate-700 font-semibold text-lg mb-1">
+              {activeCategory ? `No ${activeCategory} listings yet` : `No results found${q ? ` for "${q}"` : ''}`}
+            </p>
+            <p className="text-slate-400 text-sm mb-5">Check back soon — new items are added regularly.</p>
             <button
               onClick={() => { setSearchInput(''); setActiveCategory(''); setSort('newest'); }}
-              className="mt-3 text-sm text-maple-500 hover:underline font-medium"
+              className="inline-flex items-center gap-2 bg-maple-500 text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-maple-600 active:scale-95 transition shadow-sm text-sm"
             >
-              Clear search
+              🏷️ Browse all deals
             </button>
           </div>
         ) : (
