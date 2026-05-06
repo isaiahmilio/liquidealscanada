@@ -50,8 +50,8 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
 
         {/* Recently added badge */}
         {isNew && (
-          <span className="absolute bottom-2 left-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm tracking-wide uppercase">
-            New
+          <span className="absolute bottom-2 left-2 bg-emerald-500 text-white text-[9px] font-semibold px-2 py-0.5 rounded-lg shadow-sm tracking-wide">
+            Recently added
           </span>
         )}
 
