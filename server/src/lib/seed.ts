@@ -1,6 +1,15 @@
 import { prisma } from './db.js';
 import { hashPassword } from '../services/auth.js';
 
+async function fetchImageId(url: string): Promise<string> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch image: ${url}`);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const mimeType = res.headers.get('content-type') ?? 'image/jpeg';
+  const image = await prisma.image.create({ data: { data: buffer, mimeType } });
+  return image.id;
+}
+
 const DEMO_LISTINGS = [
   {
     title: 'Sony 65" 4K OLED Smart TV',
@@ -140,11 +149,12 @@ export async function runSeed() {
     for (const item of DEMO_LISTINGS) {
       const exists = await prisma.listing.findFirst({ where: { sellerId: seller.id, title: item.title } });
       if (exists) {
-        // Always refresh photo, description, condition, quantity in case we updated them.
+        // Only overwrite photoPath if it's still an external URL (not yet downloaded to DB).
+        const isExternal = /^https?:\/\//.test(exists.photoPath ?? '');
         await prisma.listing.update({
           where: { id: exists.id },
           data: {
-            photoPath:   item.photoPath,
+            ...(isExternal ? { photoPath: await fetchImageId(item.photoPath) } : {}),
             description: item.description,
             condition:   item.condition,
             quantity:    item.quantity,
@@ -153,11 +163,12 @@ export async function runSeed() {
         updated++;
         continue;
       }
+      const photoPath = await fetchImageId(item.photoPath);
       await prisma.listing.create({
         data: {
           sellerId: seller.id,
           title: item.title, description: item.description, category: item.category,
-          photoPath: item.photoPath, retailPriceCents: item.retailPriceCents,
+          photoPath, retailPriceCents: item.retailPriceCents,
           suggestedPriceCents: item.suggestedPriceCents, listedPriceCents: item.listedPriceCents,
           costCents: item.costCents, identifiedProduct: item.identifiedProduct,
           condition: item.condition, quantity: item.quantity,
