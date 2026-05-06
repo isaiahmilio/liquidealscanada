@@ -37,6 +37,7 @@ export function NewListing() {
   const [cost, setCost]               = useState(0);
   const [listed, setListed]           = useState(0);
   const [condition, setCondition]     = useState<Condition>('');
+  const [quantity, setQuantity]       = useState(1);
   const [publishing, setPublishing]   = useState(false);
 
   if (loading) return <p className="text-slate-500">Loading…</p>;
@@ -92,6 +93,7 @@ export function NewListing() {
         description,
         category,
         condition: condition || undefined,
+        quantity:         condition === 'Brand New' ? quantity : 1,
         costCents:        Math.round(cost * 100),
         listedPriceCents: Math.round(listed * 100),
         status:           'LIVE',
@@ -239,7 +241,11 @@ export function NewListing() {
                 <button
                   key={c}
                   type="button"
-                  onClick={() => setCondition(condition === c ? '' : c)}
+                  onClick={() => {
+                    const next = condition === c ? '' : c;
+                    setCondition(next);
+                    if (next !== 'Brand New') setQuantity(1);
+                  }}
                   className={`flex-1 py-2 rounded-xl border text-sm font-medium transition-colors ${
                     condition === c
                       ? 'bg-maple-500 border-maple-500 text-white'
@@ -248,6 +254,19 @@ export function NewListing() {
                 >{c}</button>
               ))}
             </div>
+            {condition === 'Brand New' && (
+              <div className="mt-3">
+                <label className="block">
+                  <span className="text-sm font-medium text-slate-700">Quantity in stock</span>
+                  <input
+                    type="number" min="1" step="1" placeholder="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+                  />
+                </label>
+              </div>
+            )}
           </div>
 
           <label className="block">

@@ -123,29 +123,17 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block">
-            <span className="text-sm font-medium text-slate-700">Category</span>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500 bg-white"
-            >
-              <option value="">Select…</option>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-slate-700">Quantity in stock</span>
-            <input
-              type="number" min="1" step="1" placeholder="1"
-              value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-              className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
-            />
-          </label>
-        </div>
+        <label className="block">
+          <span className="text-sm font-medium text-slate-700">Category</span>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500 bg-white"
+          >
+            <option value="">Select…</option>
+            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </label>
 
         <label className="block">
           <span className="text-sm font-medium text-slate-700">Your cost (CAD) <span className="text-slate-400 font-normal text-xs">private</span></span>
@@ -168,7 +156,11 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
               <button
                 key={c}
                 type="button"
-                onClick={() => setCondition(condition === c ? '' : c)}
+                onClick={() => {
+                  const next = condition === c ? '' : c;
+                  setCondition(next);
+                  if (next !== 'brand-new') setQuantity(1);
+                }}
                 className={`flex-1 py-2 rounded-xl border text-sm font-medium transition-colors ${
                   condition === c
                     ? 'bg-maple-500 border-maple-500 text-white'
@@ -179,6 +171,21 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
               </button>
             ))}
           </div>
+
+          {condition === 'brand-new' && (
+            <div className="mt-3">
+              <label className="block">
+                <span className="text-sm font-medium text-slate-700">Quantity in stock</span>
+                <input
+                  type="number" min="1" step="1" placeholder="1"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+                />
+              </label>
+            </div>
+          )}
+
           {(condition === 'like-new' || condition === 'used') && (
             <div className="mt-3">
               <p className="text-xs text-slate-500 mb-2">Quality: <strong>{quality}/10</strong>

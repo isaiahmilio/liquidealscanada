@@ -206,7 +206,11 @@ export function EditListing() {
               <button
                 key={c}
                 type="button"
-                onClick={() => setCondition(condition === c ? '' : c)}
+                onClick={() => {
+                  const next = condition === c ? '' : c;
+                  setCondition(next);
+                  if (next !== 'Brand New') setQuantity(1);
+                }}
                 className={`flex-1 py-2 rounded-xl border text-sm font-medium transition-colors ${
                   condition === c
                     ? 'bg-maple-500 border-maple-500 text-white'
@@ -232,7 +236,7 @@ export function EditListing() {
       <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Pricing</p>
 
-        <div className="grid grid-cols-2 gap-3">
+        {condition === 'Brand New' && (
           <label className="block">
             <span className="text-sm font-medium text-slate-700">Quantity in stock</span>
             <input
@@ -242,7 +246,9 @@ export function EditListing() {
               className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
             />
           </label>
+        )}
 
+        <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className="text-sm font-medium text-slate-700">Your cost (CAD) <span className="text-slate-400 font-normal text-xs">private</span></span>
             <div className="relative mt-1.5">
