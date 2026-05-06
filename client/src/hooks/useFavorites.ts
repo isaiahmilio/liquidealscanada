@@ -38,7 +38,10 @@ export function useFavorites() {
     onError: (_err, _id, ctx) => {
       if (ctx?.prev) qc.setQueryData(['favorites'], ctx.prev);
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: ['favorites'] }),
+    onSettled: (_data, _err, listingId) => {
+      qc.invalidateQueries({ queryKey: ['favorites'] });
+      qc.invalidateQueries({ queryKey: ['listing', listingId] });
+    },
   });
 
   return {
