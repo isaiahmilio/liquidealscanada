@@ -30,7 +30,10 @@ export function SellerDashboard() {
   if (!user)     return <Navigate to="/login" replace />;
   if (isLoading) return <p className="text-slate-500 p-6">Loading your listings…</p>;
 
-  const listings = (data?.listings ?? []).filter((l) => l.status !== 'REMOVED');
+  const listings   = (data?.listings ?? []).filter((l) => l.status !== 'REMOVED');
+  const totalViews = listings.reduce((sum, l) => sum + (l.viewCount ?? 0), 0);
+  const totalLive  = listings.filter((l) => l.status === 'LIVE').length;
+  const totalSold  = listings.filter((l) => l.status === 'SOLD').length;
 
   async function confirmRemove(id: string) {
     setRemoving(id);
@@ -84,6 +87,26 @@ export function SellerDashboard() {
         >
           + New listing
         </Link>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-6">
+        {[
+          { label: 'Total views', value: totalViews.toLocaleString(), icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          ), color: 'text-brand-600' },
+          { label: 'Live now', value: totalLive.toLocaleString(), icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          ), color: 'text-emerald-600' },
+          { label: 'Sold', value: totalSold.toLocaleString(), icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 13l4 4L19 7"/></svg>
+          ), color: 'text-slate-500' },
+        ].map(({ label, value, icon, color }) => (
+          <div key={label} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-1">
+            <div className={`${color}`}>{icon}</div>
+            <p className="text-2xl font-bold text-slate-900 leading-none mt-1">{value}</p>
+            <p className="text-xs text-slate-500">{label}</p>
+          </div>
+        ))}
       </div>
 
       {listings.length === 0 ? (
