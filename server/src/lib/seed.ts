@@ -229,36 +229,45 @@ export async function runSeed() {
     let created = 0;
     let updated = 0;
     for (const item of DEMO_LISTINGS) {
-      const exists = await prisma.listing.findFirst({ where: { sellerId: seller.id, title: item.title } });
-      if (exists) {
-        // Only overwrite photoPath if it's still an external URL (not yet downloaded to DB).
-        const isExternal = /^https?:\/\//.test(exists.photoPath ?? '');
-        await prisma.listing.update({
-          where: { id: exists.id },
+      try {
+        const exists = await prisma.listing.findFirst({ where: { sellerId: seller.id, title: item.title } });
+        if (exists) {
+          // Only overwrite photoPath if it's still an external URL (not yet downloaded to DB).
+          const isExternal = /^https?:\/\//.test(exists.photoPath ?? '');
+          let newPhotoPath: string | undefined;
+          if (isExternal) {
+            try { newPhotoPath = await fetchImageId(item.photoPath); } catch { /* keep existing */ }
+          }
+          await prisma.listing.update({
+            where: { id: exists.id },
+            data: {
+              ...(newPhotoPath ? { photoPath: newPhotoPath } : {}),
+              description: item.description,
+              condition:   item.condition,
+              quantity:    item.quantity,
+            },
+          });
+          updated++;
+          continue;
+        }
+        let photoPath: string | null = null;
+        try { photoPath = await fetchImageId(item.photoPath); } catch { /* create without photo */ }
+        await prisma.listing.create({
           data: {
-            ...(isExternal ? { photoPath: await fetchImageId(item.photoPath) } : {}),
-            description: item.description,
-            condition:   item.condition,
-            quantity:    item.quantity,
+            sellerId: seller.id,
+            title: item.title, description: item.description, category: item.category,
+            photoPath, retailPriceCents: item.retailPriceCents,
+            suggestedPriceCents: item.suggestedPriceCents, listedPriceCents: item.listedPriceCents,
+            costCents: item.costCents, identifiedProduct: item.identifiedProduct,
+            condition: item.condition, quantity: item.quantity,
+            status: 'LIVE',
+            priceSources: { create: item.priceSources },
           },
         });
-        updated++;
-        continue;
+        created++;
+      } catch (err) {
+        console.error(`[seed] failed to seed "${item.title}":`, err);
       }
-      const photoPath = await fetchImageId(item.photoPath);
-      await prisma.listing.create({
-        data: {
-          sellerId: seller.id,
-          title: item.title, description: item.description, category: item.category,
-          photoPath, retailPriceCents: item.retailPriceCents,
-          suggestedPriceCents: item.suggestedPriceCents, listedPriceCents: item.listedPriceCents,
-          costCents: item.costCents, identifiedProduct: item.identifiedProduct,
-          condition: item.condition, quantity: item.quantity,
-          status: 'LIVE',
-          priceSources: { create: item.priceSources },
-        },
-      });
-      created++;
     }
     if (created > 0) console.log(`[seed] created ${created} demo listing(s)`);
     if (updated > 0) console.log(`[seed] refreshed ${updated} demo listing(s)`);
