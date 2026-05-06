@@ -7,13 +7,17 @@ interface Props {
 }
 
 const PRESETS = [
-  { offPct: 20, label: '20% off' },
-  { offPct: 30, label: '30% off' },
-  { offPct: 40, label: '40% off ★' },
-  { offPct: 50, label: '50% off' },
-  { offPct: 60, label: '60% off' },
-  { offPct: 70, label: '70% off' },
-  { offPct: 80, label: '80% off' },
+  { offPct: 0,   label: '0% off' },
+  { offPct: 10,  label: '10% off' },
+  { offPct: 20,  label: '20% off' },
+  { offPct: 30,  label: '30% off' },
+  { offPct: 40,  label: '40% off ★' },
+  { offPct: 50,  label: '50% off' },
+  { offPct: 60,  label: '60% off' },
+  { offPct: 70,  label: '70% off' },
+  { offPct: 80,  label: '80% off' },
+  { offPct: 90,  label: '90% off' },
+  { offPct: 100, label: '100% off' },
 ];
 
 export function PricePresetButtons({ retailCents, onPick, selectedCents }: Props) {
