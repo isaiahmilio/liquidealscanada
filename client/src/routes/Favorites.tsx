@@ -113,7 +113,7 @@ function FavoriteRow({ fav }: { fav: FavoriteEntry }) {
             {savings > 0 && (
               <>
                 <span className="text-xs text-slate-400 line-through">{formatCents(fav.listing.retailPriceCents)}</span>
-                <span className="text-xs font-semibold text-brand-600">-{savings}%</span>
+                <span className="text-xs font-semibold text-brand-600">-{savings}% off</span>
               </>
             )}
           </div>

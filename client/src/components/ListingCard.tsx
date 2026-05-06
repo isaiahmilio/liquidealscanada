@@ -34,7 +34,7 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
           <span className={`absolute top-2 left-2 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-sm ${
             isHot ? 'bg-maple-500' : 'bg-brand-600'
           }`}>
-            -{savings}%
+            -{savings}% off
           </span>
         )}
 
