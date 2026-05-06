@@ -86,7 +86,7 @@ export function Browse() {
     );
   }
 
-  if (!data || data.listings.length === 0) {
+  if (!data || (data.listings.length === 0 && !activeCategory && !q)) {
     return (
       <div>
         <HeroBanner total={0} />
