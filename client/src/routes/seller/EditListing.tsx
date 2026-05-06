@@ -157,7 +157,7 @@ export function EditListing() {
               <span className="absolute bottom-1 left-1 text-[9px] font-bold bg-maple-500 text-white rounded px-1">Main</span>
             </div>
           )}
-          {(listing.photos ?? []).map((p) => (
+          {(listing.photos ?? []).filter(p => p.id !== 'primary').map((p) => (
             <div key={p.id} className="relative">
               <img src={p.url} alt="" className="w-20 h-20 object-cover rounded-xl border border-slate-200" />
               <button
