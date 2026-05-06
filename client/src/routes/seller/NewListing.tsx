@@ -22,7 +22,7 @@ export function NewListing() {
   const { user, loading } = useAuth();
   const nav = useNavigate();
 
-  const [mode, setMode]         = useState<Mode>('auto');
+  const [mode, setMode]         = useState<Mode>('manual');
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [listing, setListing]   = useState<OwnerListing | null>(null);
@@ -43,11 +43,16 @@ export function NewListing() {
   if (mode === 'manual') {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => setMode('auto')} className="text-slate-400 hover:text-slate-700 text-sm">← Back</button>
-          <h1 className="text-xl font-bold text-slate-900">Manual listing</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl font-bold text-slate-900">New listing</h1>
+          <button
+            onClick={() => setMode('auto')}
+            className="text-sm text-slate-400 hover:text-maple-500 font-medium transition-colors"
+          >
+            Switch to AI auto-fill →
+          </button>
         </div>
-        <ManualListing onBack={() => setMode('auto')} />
+        <ManualListing onBack={() => nav('/seller')} />
       </div>
     );
   }
@@ -140,7 +145,7 @@ export function NewListing() {
         <p className="text-center text-sm text-slate-400 mt-5">
           Prefer to enter details yourself?{' '}
           <button onClick={() => setMode('manual')} className="text-maple-500 hover:underline font-medium">
-            Switch to manual entry
+            ← Back to manual entry
           </button>
         </p>
       </div>
