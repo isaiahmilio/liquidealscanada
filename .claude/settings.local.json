@@ -35,7 +35,8 @@
       "PowerShell(cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" whoami)",
       "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" whoami)",
       "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" login --browserless)",
-      "PowerShell(git commit *)"
+      "PowerShell(git commit *)",
+      "PowerShell($token = \"1c52a84a-b5c1-43fa-9199-e62a46a08c9b\"; $serviceId = \"a4328dd6-77c6-4504-9680-e0f41f464294\"; $environmentId = \"225f70b5-5424-40d6-8a1a-f0b4b408cbbe\"; $body = \"{`\"query`\":`\"mutation { serviceInstanceDeploy\\(serviceId: \\\\`\"$serviceId\\\\`\", environmentId: \\\\`\"$environmentId\\\\`\"\\) }`\"}\"; $response = Invoke-WebRequest -Uri \"https://backboard.railway.app/graphql/v2\" -Method POST -Headers @{\"Authorization\"=\"Bearer $token\"; \"Content-Type\"=\"application/json\"} -Body $body; $response.Content)"
     ]
   }
 }

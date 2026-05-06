@@ -156,10 +156,10 @@ function HeroBanner({ total }: { total: number | null }) {
       {/* Trust bar */}
       <div className="bg-maple-600 border-t border-maple-700">
         <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-center sm:justify-start gap-x-8 gap-y-1 text-white/80 text-xs font-medium">
-          <span className="flex items-center gap-1.5">✅ Free to browse</span>
+          <span className="flex items-center gap-1.5">🔒 Secure checkout</span>
           <span className="flex items-center gap-1.5">📦 New items added daily</span>
-          <span className="flex items-center gap-1.5">💳 Seller-direct pricing</span>
-          <span className="flex items-center gap-1.5">🍁 Canadian sellers only</span>
+          <span className="flex items-center gap-1.5">💰 Discounted pricing</span>
+          <span className="flex items-center gap-1.5">🍁 Canadian sellers</span>
         </div>
       </div>
     </div>
