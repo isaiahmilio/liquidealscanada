@@ -124,7 +124,7 @@ const DEMO_LISTINGS = [
   },
   {
     title: 'Grey L-Shape Sectional Sofa',
-    description: "Selling before our move to Vancouver. 3 years old, no pets no kids. Small scuff on one armrest, nothing major. Approx 110\" x 90\". Pickup in Mississauga.",
+    description: "3 years old, no pets no kids. Small scuff on one armrest, otherwise great shape. Approx 110\" x 90\". Pickup in Mississauga.",
     category: 'Home',
     photoPath: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
     retailPriceCents: 189900, suggestedPriceCents: 52000, listedPriceCents: 45000, costCents: 22000,
@@ -137,7 +137,7 @@ const DEMO_LISTINGS = [
   },
   {
     title: 'Peloton Bike+ — Barely Used',
-    description: "COVID purchase that never got the use I hoped. Includes shoes (size 10M / 11W), mat, and 3lb weights. Works perfectly. Pickup in Etobicoke.",
+    description: "Includes shoes (size 10M / 11W), mat, and 3lb weights. Works perfectly. Pickup in Etobicoke.",
     category: 'Sports',
     photoPath: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80',
     retailPriceCents: 299500, suggestedPriceCents: 95000, listedPriceCents: 85000, costCents: 45000,
@@ -150,7 +150,7 @@ const DEMO_LISTINGS = [
   },
   {
     title: 'iPhone 13 Pro 256GB — Unlocked',
-    description: "Upgrading to 15, no longer need this. No cracks or scratches. Battery health 91%. Comes in original box with cable and a silicone case. Unlocked, works on any carrier.",
+    description: "No cracks or scratches. Battery health 91%. Comes in original box with cable and a silicone case. Unlocked, works on any carrier.",
     category: 'Electronics',
     photoPath: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80',
     retailPriceCents: 139900, suggestedPriceCents: 62000, listedPriceCents: 57900, costCents: 30000,
@@ -164,7 +164,7 @@ const DEMO_LISTINGS = [
   },
   {
     title: 'Trek Marlin 5 Mountain Bike — Medium',
-    description: "Bought last summer, ridden maybe a dozen times. Alloy frame, 21-speed Shimano. Small scratch on the downtube from a tip-over, rides perfectly. Helmet included.",
+    description: "Alloy frame, 21-speed Shimano drivetrain. Small scratch on the downtube, rides perfectly. Helmet included.",
     category: 'Sports',
     photoPath: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=600&q=80',
     retailPriceCents: 69900, suggestedPriceCents: 32000, listedPriceCents: 27500, costCents: 15000,
@@ -178,7 +178,7 @@ const DEMO_LISTINGS = [
   },
   {
     title: 'MacBook Pro 14" M2 — 16GB / 512GB',
-    description: "Company-issued laptop, replaced by IT department. Light scratches on the lid. Battery charges to 100%, great performance. AppleCare valid until March 2026.",
+    description: "Light scratches on the lid, screen is perfect. Battery charges to 100%. AppleCare valid until March 2026.",
     category: 'Electronics',
     photoPath: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80',
     retailPriceCents: 249900, suggestedPriceCents: 149000, listedPriceCents: 139900, costCents: 70000,
@@ -192,7 +192,7 @@ const DEMO_LISTINGS = [
   },
   {
     title: 'LG 27" 4K UHD Monitor — USB-C',
-    description: "Switching to an ultrawide, selling this. Zero dead pixels, no scratches on screen. Includes original stand, HDMI cable, and USB-C cable. Model 27UK850.",
+    description: "Zero dead pixels, no scratches on screen. Includes original stand, HDMI cable, and USB-C cable. Model 27UK850.",
     category: 'Electronics',
     photoPath: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&q=80',
     retailPriceCents: 49999, suggestedPriceCents: 23000, listedPriceCents: 21500, costCents: 12000,
