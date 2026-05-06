@@ -149,12 +149,6 @@ function HeroBanner({ total }: { total: number | null }) {
                 🏷️ {total} deal{total !== 1 ? 's' : ''} available now
               </span>
             )}
-            <Link
-              to="/signup"
-              className="inline-flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition border border-white/30"
-            >
-              Sell your items →
-            </Link>
           </div>
         </div>
       </div>

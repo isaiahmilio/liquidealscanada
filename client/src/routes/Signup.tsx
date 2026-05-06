@@ -30,7 +30,7 @@ export function Signup() {
         <div className="text-center mb-8">
           <div className="text-4xl mb-3">🎉</div>
           <h1 className="text-2xl font-bold text-slate-900">Join LiquiDealsCanada</h1>
-          <p className="text-slate-500 text-sm mt-1">Buy liquidation goods or list your own items</p>
+          <p className="text-slate-500 text-sm mt-1">Get access to liquidation deals from coast to coast</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
@@ -87,7 +87,7 @@ export function Signup() {
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-          {['Free to join', 'Buy & sell', 'Pan-Canada'].map((f) => (
+          {['Free to join', 'New deals daily', 'Pan-Canada'].map((f) => (
             <div key={f} className="bg-white border border-slate-200 rounded-xl py-3 px-2">
               <p className="text-xs font-medium text-slate-600">{f}</p>
             </div>

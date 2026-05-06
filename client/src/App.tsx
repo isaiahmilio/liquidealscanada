@@ -149,7 +149,6 @@ export function App() {
           <div className="flex gap-6 text-sm text-slate-400">
             <Link to="/" className="hover:text-maple-500 transition-colors">Browse</Link>
             <Link to="/search" className="hover:text-maple-500 transition-colors">Search</Link>
-            <Link to="/signup" className="hover:text-maple-500 transition-colors">Sell with us</Link>
           </div>
         </div>
         <div className="border-t border-slate-100 py-3 text-center text-xs text-slate-400">
