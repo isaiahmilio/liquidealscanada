@@ -7,17 +7,17 @@ interface Props {
 }
 
 const PRESETS = [
-  { offPct: 0,   label: '0% off' },
-  { offPct: 10,  label: '10% off' },
-  { offPct: 20,  label: '20% off' },
-  { offPct: 30,  label: '30% off' },
-  { offPct: 40,  label: '40% off ★' },
-  { offPct: 50,  label: '50% off' },
-  { offPct: 60,  label: '60% off' },
-  { offPct: 70,  label: '70% off' },
-  { offPct: 80,  label: '80% off' },
-  { offPct: 90,  label: '90% off' },
-  { offPct: 100, label: '100% off' },
+  { offPct: 0   },
+  { offPct: 10  },
+  { offPct: 20  },
+  { offPct: 30  },
+  { offPct: 40  },
+  { offPct: 50  },
+  { offPct: 60  },
+  { offPct: 70  },
+  { offPct: 80  },
+  { offPct: 90  },
+  { offPct: 100 },
 ];
 
 export function PricePresetButtons({ retailCents, onPick, selectedCents }: Props) {
@@ -28,6 +28,7 @@ export function PricePresetButtons({ retailCents, onPick, selectedCents }: Props
       {PRESETS.map((p) => {
         const cents = Math.round(retailCents * (1 - p.offPct / 100));
         const isActive = selectedCents !== undefined && Math.abs(selectedCents - cents) < 2;
+        const isHot = p.offPct >= 50;
         return (
           <button
             key={p.offPct}
@@ -36,12 +37,15 @@ export function PricePresetButtons({ retailCents, onPick, selectedCents }: Props
             className={`flex flex-col items-center px-3 py-1.5 rounded-xl border text-xs font-medium transition-all ${
               isActive
                 ? 'bg-maple-500 border-maple-500 text-white shadow-sm'
-                : p.offPct === 40
-                ? 'border-brand-300 text-brand-700 bg-brand-50 hover:bg-brand-100'
+                : isHot
+                ? 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
                 : 'border-slate-200 text-slate-600 hover:border-maple-300 hover:bg-maple-50 hover:text-maple-700'
             }`}
           >
-            <span className="font-bold">{p.label}</span>
+            <span className="font-bold flex items-center gap-0.5">
+              {isHot && <span className={isActive ? 'text-white' : 'text-emerald-500'}>★</span>}
+              {p.offPct}% off
+            </span>
             <span className="opacity-80">{formatCents(cents)}</span>
           </button>
         );

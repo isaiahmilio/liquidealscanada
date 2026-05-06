@@ -7,7 +7,7 @@ const HOURS_48 = 48 * 60 * 60 * 1000;
 
 export function ListingCard({ listing }: { listing: PublicListing }) {
   const savings = savingsPercent(listing.retailPriceCents, listing.listedPriceCents);
-  const isHot = savings >= 40;
+  const isHot = savings >= 50;
   const isNew = Date.now() - new Date(listing.createdAt).getTime() < HOURS_48;
 
   return (

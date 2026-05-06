@@ -27,7 +27,7 @@ export function FavoriteButton({
         active
           ? 'bg-red-50 text-red-500 hover:bg-red-100'
           : 'bg-slate-100 text-slate-400 hover:text-red-400 hover:bg-red-50'
-      } shadow-sm backdrop-blur-sm ${className}`}
+      } shadow-sm ${className}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
