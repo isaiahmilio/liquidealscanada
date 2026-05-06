@@ -8,7 +8,7 @@ import { ProfitMarginBadge } from '../../components/ProfitMarginBadge';
 
 type Condition = 'new' | 'like-new' | 'used' | '';
 
-const CATEGORIES = ['Electronics', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
+const CATEGORIES = ['Electronics', 'Gaming', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
 
 export function ManualListing({ onBack }: { onBack: () => void }) {
   const nav = useNavigate();

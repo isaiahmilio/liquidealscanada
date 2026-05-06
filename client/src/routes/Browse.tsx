@@ -6,12 +6,18 @@ import type { ListingsPage } from '../lib/types';
 import { ListingCard } from '../components/ListingCard';
 
 const CATEGORIES = [
-  { label: 'All Deals', emoji: '🏷️', value: '' },
+  { label: 'All Deals',   emoji: '🏷️', value: '' },
   { label: 'Electronics', emoji: '📱', value: 'Electronics' },
-  { label: 'Kitchen', emoji: '🍳', value: 'Kitchen' },
-  { label: 'Gaming', emoji: '🎮', value: 'Gaming' },
-  { label: 'Home', emoji: '🏠', value: 'Home' },
-  { label: 'Clothing', emoji: '👕', value: 'Clothing' },
+  { label: 'Gaming',      emoji: '🎮', value: 'Gaming' },
+  { label: 'Home',        emoji: '🏠', value: 'Home' },
+  { label: 'Kitchen',     emoji: '🍳', value: 'Kitchen' },
+  { label: 'Clothing',    emoji: '👕', value: 'Clothing' },
+  { label: 'Beauty',      emoji: '💄', value: 'Beauty' },
+  { label: 'Tools',       emoji: '🔧', value: 'Tools' },
+  { label: 'Toys',        emoji: '🧸', value: 'Toys' },
+  { label: 'Sports',      emoji: '⚽', value: 'Sports' },
+  { label: 'Office',      emoji: '🖊️', value: 'Office' },
+  { label: 'Other',       emoji: '📦', value: 'Other' },
 ];
 
 export function Browse() {

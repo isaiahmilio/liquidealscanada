@@ -8,7 +8,7 @@ import { PricePresetButtons } from '../../components/PricePresetButtons';
 import { ProfitMarginBadge } from '../../components/ProfitMarginBadge';
 import { formatCents } from '../../lib/pricing';
 
-const CATEGORIES = ['Electronics', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
+const CATEGORIES = ['Electronics', 'Gaming', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
 
 const STATUS_LABEL: Record<string, string> = {
   DRAFT: 'Draft',

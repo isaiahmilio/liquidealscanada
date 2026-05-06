@@ -17,7 +17,7 @@ interface CreateResponse {
   ai: { confidence: number; source: 'serpapi' | 'static' | 'none' };
 }
 
-const CATEGORIES = ['Electronics', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
+const CATEGORIES = ['Electronics', 'Gaming', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
 
 export function NewListing() {
   const { user, loading } = useAuth();
