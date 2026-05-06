@@ -24,6 +24,8 @@ export interface PublicListing {
   identifiedProduct: string | null;
   condition: string | null;
   quantity: number;
+  viewCount: number;
+  favoriteCount: number;
   status: 'DRAFT' | 'LIVE' | 'SOLD' | 'REMOVED';
   createdAt: string;
   updatedAt: string;

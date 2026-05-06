@@ -39,11 +39,13 @@ interface ListingWithSources {
   identifiedProduct: string | null;
   condition: string | null;
   quantity: number;
+  viewCount: number;
   status: string;
   createdAt: Date;
   updatedAt: Date;
   priceSources?: { retailer: string; priceCents: number; url: string | null }[];
   photos?: { id: string; photoPath: string; position: number }[];
+  _count?: { favoritedBy: number };
 }
 
 function serializeListing(listing: ListingWithSources, viewerId: string | undefined) {
@@ -68,6 +70,8 @@ function serializeListing(listing: ListingWithSources, viewerId: string | undefi
     identifiedProduct: listing.identifiedProduct,
     condition: listing.condition,
     quantity: listing.quantity,
+    viewCount: listing.viewCount,
+    favoriteCount: listing._count?.favoritedBy ?? 0,
     status: listing.status,
     createdAt: listing.createdAt,
     updatedAt: listing.updatedAt,
@@ -220,13 +224,16 @@ listingsRouter.get('/:id', async (req, res, next) => {
   try {
     const listing = await prisma.listing.findUnique({
       where: { id: req.params.id },
-      include: { priceSources: true, photos: true },
+      include: { priceSources: true, photos: true, _count: { select: { favoritedBy: true } } },
     });
     if (!listing) return res.status(404).json({ error: 'Not found' });
 
     // Non-owners can only view LIVE listings.
     const isOwner = req.user?.id === listing.sellerId;
     if (!isOwner && listing.status !== 'LIVE') return res.status(404).json({ error: 'Not found' });
+
+    // Increment view count in the background — don't await so response is not delayed.
+    prisma.listing.update({ where: { id: listing.id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
 
     res.json({ listing: serializeListing(listing as ListingWithSources, req.user?.id) });
   } catch (err) {
