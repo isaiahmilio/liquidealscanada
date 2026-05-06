@@ -77,7 +77,7 @@ export function Browse() {
     );
   }
 
-  if (!data || (data.listings.length === 0 && !activeCategory && !q)) {
+  if (!data || (data.listings.length === 0 && !activeCategory)) {
     return (
       <div>
         <HeroBanner total={0} />
