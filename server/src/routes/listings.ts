@@ -38,6 +38,7 @@ interface ListingWithSources {
   costCents: number;
   identifiedProduct: string | null;
   condition: string | null;
+  quantity: number;
   status: string;
   createdAt: Date;
   updatedAt: Date;
@@ -66,6 +67,7 @@ function serializeListing(listing: ListingWithSources, viewerId: string | undefi
     listedPriceCents: listing.listedPriceCents,
     identifiedProduct: listing.identifiedProduct,
     condition: listing.condition,
+    quantity: listing.quantity,
     status: listing.status,
     createdAt: listing.createdAt,
     updatedAt: listing.updatedAt,
@@ -176,13 +178,14 @@ sellerListingsRouter.get('/listings', requireAuth, requireSeller, async (req, re
 // POST /api/seller/listings/manual — create a listing manually with optional images, no AI.
 sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload.array('images', 10), async (req, res, next) => {
   try {
-    const { title, description, category, condition, costCents, retailPriceCents, listedPriceCents } = req.body;
+    const { title, description, category, condition, costCents, retailPriceCents, listedPriceCents, quantity } = req.body;
     if (!title || typeof title !== 'string' || !title.trim()) {
       return res.status(400).json({ error: 'title is required' });
     }
     const retail = Math.max(0, Math.round(Number(retailPriceCents) || 0));
     const listed = Math.max(0, Math.round(Number(listedPriceCents) || 0));
     const cost   = Math.max(0, Math.round(Number(costCents)        || 0));
+    const qty    = Math.max(1, Math.round(Number(quantity)         || 1));
 
     const files = (req.files as Express.Multer.File[]) ?? [];
     const [primary, ...extras] = await Promise.all(files.map((f) => putImage(f.buffer, f.originalname, f.mimetype)));
@@ -194,6 +197,7 @@ sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload
         description:         description ? String(description).trim() : null,
         category:            category    ? String(category).trim()    : null,
         condition:           condition   ? String(condition).trim()   : null,
+        quantity:            qty,
         costCents:           cost,
         retailPriceCents:    retail,
         suggestedPriceCents: Math.round(retail * 0.6),

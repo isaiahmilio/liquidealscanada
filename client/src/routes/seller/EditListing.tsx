@@ -38,6 +38,7 @@ export function EditListing() {
   const [condition, setCondition]     = useState('');
   const [cost, setCost]               = useState(0);
   const [listed, setListed]           = useState(0);
+  const [quantity, setQuantity]       = useState(1);
 
   useEffect(() => {
     if (!data) return;
@@ -47,6 +48,7 @@ export function EditListing() {
     setCondition(data.listing.condition ?? '');
     setCost(data.listing.costCents / 100);
     setListed(data.listing.listedPriceCents / 100);
+    setQuantity(data.listing.quantity ?? 1);
   }, [data]);
 
   if (loading || isLoading) return <p className="text-slate-500 p-6">Loading…</p>;
@@ -70,7 +72,7 @@ export function EditListing() {
   }
 
   async function saveAll() {
-    await save({ title, description, category, condition: condition || undefined, costCents, listedPriceCents: listedCents });
+    await save({ title, description, category, condition: condition || undefined, quantity, costCents, listedPriceCents: listedCents });
   }
 
   async function setStatus(status: OwnerListing['status']) {
@@ -200,7 +202,7 @@ export function EditListing() {
         <div>
           <span className="text-sm font-medium text-slate-700">Condition</span>
           <div className="flex gap-2 mt-1.5">
-            {['New', 'Like New', 'Used'].map((c) => (
+            {['Brand New', 'Like New', 'Used'].map((c) => (
               <button
                 key={c}
                 type="button"
@@ -231,6 +233,16 @@ export function EditListing() {
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Pricing</p>
 
         <div className="grid grid-cols-2 gap-3">
+          <label className="block">
+            <span className="text-sm font-medium text-slate-700">Quantity in stock</span>
+            <input
+              type="number" min="1" step="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+            />
+          </label>
+
           <label className="block">
             <span className="text-sm font-medium text-slate-700">Your cost (CAD) <span className="text-slate-400 font-normal text-xs">private</span></span>
             <div className="relative mt-1.5">

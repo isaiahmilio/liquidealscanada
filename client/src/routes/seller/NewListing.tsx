@@ -10,7 +10,7 @@ import { formatCents } from '../../lib/pricing';
 import { ManualListing } from './ManualListing';
 
 type Mode = 'auto' | 'manual';
-type Condition = 'New' | 'Like New' | 'Used' | '';
+type Condition = 'Brand New' | 'Like New' | 'Used' | '';
 
 interface CreateResponse {
   listing: OwnerListing;
@@ -235,7 +235,7 @@ export function NewListing() {
           <div>
             <span className="text-sm font-medium text-slate-700">Condition</span>
             <div className="flex gap-2 mt-1.5">
-              {(['New', 'Like New', 'Used'] as Condition[]).map((c) => (
+              {(['Brand New', 'Like New', 'Used'] as Condition[]).map((c) => (
                 <button
                   key={c}
                   type="button"

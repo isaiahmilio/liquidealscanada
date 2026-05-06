@@ -82,17 +82,24 @@ export function ListingDetail() {
             <FavoriteButton listingId={listing.id} className="flex-shrink-0 mt-1" />
           </div>
 
-          {listing.condition && (
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
-                listing.condition.startsWith('New')
-                  ? 'bg-green-100 text-green-700'
-                  : listing.condition.startsWith('Like New')
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-amber-100 text-amber-700'
-              }`}>
-                ✦ {listing.condition}
-              </span>
+          {(listing.condition || listing.quantity > 1) && (
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {listing.condition && (
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${
+                  listing.condition.startsWith('Brand New')
+                    ? 'bg-green-100 text-green-700'
+                    : listing.condition.startsWith('Like New')
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-amber-100 text-amber-700'
+                }`}>
+                  ✦ {listing.condition}
+                </span>
+              )}
+              {listing.quantity > 1 && (
+                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                  {listing.quantity} in stock
+                </span>
+              )}
             </div>
           )}
           </div>

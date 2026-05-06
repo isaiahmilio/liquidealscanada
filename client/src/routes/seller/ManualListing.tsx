@@ -6,7 +6,7 @@ import { ImageDropzone } from '../../components/ImageDropzone';
 import { PricePresetButtons } from '../../components/PricePresetButtons';
 import { ProfitMarginBadge } from '../../components/ProfitMarginBadge';
 
-type Condition = 'new' | 'like-new' | 'used' | '';
+type Condition = 'brand-new' | 'like-new' | 'used' | '';
 
 const CATEGORIES = ['Electronics', 'Gaming', 'Home', 'Kitchen', 'Clothing', 'Beauty', 'Tools', 'Toys', 'Sports', 'Office', 'Other'];
 
@@ -18,6 +18,7 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [condition, setCondition]     = useState<Condition>('');
   const [quality, setQuality]         = useState(8);
+  const [quantity, setQuantity]       = useState(1);
   const [description, setDescription] = useState('');
   const [category, setCategory]       = useState('');
   const [cost, setCost]               = useState('');
@@ -45,7 +46,7 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
   }
 
   function conditionText() {
-    if (condition === 'new') return 'New';
+    if (condition === 'brand-new') return 'Brand New';
     if (condition === 'like-new') return `Like New — ${quality}/10`;
     if (condition === 'used') return `Used — ${quality}/10`;
     return '';
@@ -63,6 +64,7 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
       fd.append('costCents',        String(costCents));
       fd.append('retailPriceCents', String(retailCents));
       fd.append('listedPriceCents', String(listedCents));
+      fd.append('quantity',         String(quantity));
       for (const photo of photos) fd.append('images', photo);
 
       const res = await api.post<{ listing: OwnerListing }>('/api/seller/listings/manual', fd);
@@ -135,24 +137,34 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-slate-700">Your cost (CAD) <span className="text-slate-400 font-normal text-xs">private</span></span>
-            <div className="relative mt-1.5">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
-              <input
-                type="number" step="0.01" min="0" placeholder="0.00"
-                value={cost}
-                onChange={(e) => setCost(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
-              />
-            </div>
+            <span className="text-sm font-medium text-slate-700">Quantity in stock</span>
+            <input
+              type="number" min="1" step="1" placeholder="1"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              className="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+            />
           </label>
         </div>
+
+        <label className="block">
+          <span className="text-sm font-medium text-slate-700">Your cost (CAD) <span className="text-slate-400 font-normal text-xs">private</span></span>
+          <div className="relative mt-1.5">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">$</span>
+            <input
+              type="number" step="0.01" min="0" placeholder="0.00"
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 pl-7 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-maple-500"
+            />
+          </div>
+        </label>
 
         {/* Condition */}
         <div>
           <span className="text-sm font-medium text-slate-700">Condition</span>
           <div className="flex gap-2 mt-1.5">
-            {(['new', 'like-new', 'used'] as Condition[]).map((c) => (
+            {(['brand-new', 'like-new', 'used'] as Condition[]).map((c) => (
               <button
                 key={c}
                 type="button"
@@ -163,7 +175,7 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
                     : 'border-slate-300 text-slate-600 hover:border-maple-300 hover:text-maple-600'
                 }`}
               >
-                {c === 'new' ? 'New' : c === 'like-new' ? 'Like New' : 'Used'}
+                {c === 'brand-new' ? 'Brand New' : c === 'like-new' ? 'Like New' : 'Used'}
               </button>
             ))}
           </div>
