@@ -31,4 +31,5 @@ export const listingQuerySchema = z.object({
   q:        z.string().max(200).optional(),
   category: z.string().max(100).optional(),
   page:     z.coerce.number().int().min(1).max(1000).optional().default(1),
+  sort:     z.enum(['newest', 'price_asc', 'price_desc', 'most_viewed', 'discount']).optional().default('newest'),
 });

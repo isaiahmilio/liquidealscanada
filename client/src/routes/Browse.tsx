@@ -20,10 +20,21 @@ const CATEGORIES = [
   { label: 'Other',       emoji: '📦', value: 'Other' },
 ];
 
+type SortOption = 'newest' | 'price_asc' | 'price_desc' | 'most_viewed' | 'discount';
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'newest',      label: 'Newest' },
+  { value: 'price_asc',   label: 'Price ↑' },
+  { value: 'price_desc',  label: 'Price ↓' },
+  { value: 'most_viewed', label: 'Most viewed' },
+  { value: 'discount',    label: 'Biggest discount' },
+];
+
 export function Browse() {
   const [activeCategory, setActiveCategory] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [q, setQ] = useState('');
+  const [sort, setSort] = useState<SortOption>('newest');
 
   // Debounce: wait 350ms after typing stops before hitting the server
   useEffect(() => {
@@ -34,10 +45,11 @@ export function Browse() {
   const params = new URLSearchParams();
   if (q) params.set('q', q);
   if (activeCategory) params.set('category', activeCategory);
+  if (sort !== 'newest') params.set('sort', sort);
   const qs = params.toString();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['listings', 'browse', q, activeCategory],
+    queryKey: ['listings', 'browse', q, activeCategory, sort],
     queryFn: () => api.get<ListingsPage>(`/api/listings${qs ? `?${qs}` : ''}`),
   });
 
@@ -118,7 +130,7 @@ export function Browse() {
         </div>
 
         {/* Category filter pills */}
-        <div className="flex gap-2 flex-wrap mb-6">
+        <div className="flex gap-2 flex-wrap mb-3">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.value}
@@ -131,6 +143,24 @@ export function Browse() {
             >
               <span>{cat.emoji}</span>
               <span>{cat.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Sort pills */}
+        <div className="flex items-center gap-2 flex-wrap mb-6">
+          <span className="text-xs text-slate-400 font-medium pr-1">Sort:</span>
+          {SORT_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setSort(opt.value)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                sort === opt.value
+                  ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400 hover:text-slate-800'
+              }`}
+            >
+              {opt.label}
             </button>
           ))}
         </div>
@@ -153,7 +183,7 @@ export function Browse() {
           </p>
           {(q || activeCategory) && (
             <button
-              onClick={() => { setSearchInput(''); setActiveCategory(''); }}
+              onClick={() => { setSearchInput(''); setActiveCategory(''); setSort('newest'); }}
               className="text-xs text-maple-500 hover:underline font-medium"
             >
               Clear filters
@@ -166,7 +196,7 @@ export function Browse() {
             <div className="text-4xl mb-3">🔍</div>
             <p className="text-slate-600 font-medium">No results found{q ? ` for "${q}"` : ''}.</p>
             <button
-              onClick={() => { setSearchInput(''); setActiveCategory(''); }}
+              onClick={() => { setSearchInput(''); setActiveCategory(''); setSort('newest'); }}
               className="mt-3 text-sm text-maple-500 hover:underline font-medium"
             >
               Clear search

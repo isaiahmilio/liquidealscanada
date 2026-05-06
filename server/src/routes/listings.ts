@@ -125,12 +125,19 @@ listingsRouter.post('/', requireAuth, requireSeller, upload.single('image'), asy
   }
 });
 
+const ORDER_BY_MAP = {
+  newest:      { createdAt:        'desc' as const },
+  price_asc:   { listedPriceCents: 'asc'  as const },
+  price_desc:  { listedPriceCents: 'desc' as const },
+  most_viewed: { viewCount:        'desc' as const },
+};
+
 // GET /api/listings — public, paginated LIVE listings.
 listingsRouter.get('/', async (req, res, next) => {
   try {
     const parsed = listingQuerySchema.safeParse(req.query);
     if (!parsed.success) return res.status(400).json({ error: 'Invalid query' });
-    const { q, category, page } = parsed.data;
+    const { q, category, page, sort } = parsed.data;
 
     const where = {
       status: 'LIVE',
@@ -143,16 +150,31 @@ listingsRouter.get('/', async (req, res, next) => {
       ] } : {}),
     };
 
-    const [items, total] = await Promise.all([
-      prisma.listing.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
-        include: { photos: true },
-      }),
-      prisma.listing.count({ where }),
-    ]);
+    let items: ListingWithSources[];
+    let total: number;
+
+    if (sort === 'discount') {
+      // Compute discount % in JS — dataset is small enough that fetching all is fine.
+      const all = await prisma.listing.findMany({ where, include: { photos: true } });
+      all.sort((a, b) => {
+        const da = a.retailPriceCents > 0 ? (a.retailPriceCents - a.listedPriceCents) / a.retailPriceCents : 0;
+        const db = b.retailPriceCents > 0 ? (b.retailPriceCents - b.listedPriceCents) / b.retailPriceCents : 0;
+        return db - da;
+      });
+      total = all.length;
+      items = all.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) as ListingWithSources[];
+    } else {
+      [items, total] = await Promise.all([
+        prisma.listing.findMany({
+          where,
+          orderBy: ORDER_BY_MAP[sort],
+          skip: (page - 1) * PAGE_SIZE,
+          take: PAGE_SIZE,
+          include: { photos: true },
+        }),
+        prisma.listing.count({ where }),
+      ]) as [ListingWithSources[], number];
+    }
 
     res.json({
       listings: items.map((l) => serializeListing(l as ListingWithSources, req.user?.id)),
