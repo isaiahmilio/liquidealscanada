@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
@@ -22,15 +22,26 @@ const CATEGORIES = [
 
 export function Browse() {
   const [activeCategory, setActiveCategory] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [q, setQ] = useState('');
+
+  // Debounce: wait 350ms after typing stops before hitting the server
+  useEffect(() => {
+    const t = setTimeout(() => setQ(searchInput.trim()), 350);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const params = new URLSearchParams();
+  if (q) params.set('q', q);
+  if (activeCategory) params.set('category', activeCategory);
+  const qs = params.toString();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['listings', 'browse'],
-    queryFn: () => api.get<ListingsPage>('/api/listings'),
+    queryKey: ['listings', 'browse', q, activeCategory],
+    queryFn: () => api.get<ListingsPage>(`/api/listings${qs ? `?${qs}` : ''}`),
   });
 
-  const filtered = activeCategory
-    ? (data?.listings ?? []).filter((l) => l.category === activeCategory)
-    : (data?.listings ?? []);
+  const filtered = data?.listings ?? [];
 
   if (isLoading) {
     return (
@@ -81,6 +92,31 @@ export function Browse() {
       <HeroBanner total={data.total} />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
+
+        {/* Search bar */}
+        <div className="relative mb-5">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search deals — e.g. AirPods, vacuum, gaming…"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="w-full pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-maple-500 focus:border-transparent placeholder:text-slate-400"
+          />
+          {searchInput && (
+            <button
+              onClick={() => setSearchInput('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+
         {/* Category filter pills */}
         <div className="flex gap-2 flex-wrap mb-6">
           {CATEGORIES.map((cat) => (
@@ -102,20 +138,38 @@ export function Browse() {
         {/* Results header */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-slate-500">
-            <span className="font-semibold text-slate-900">{filtered.length}</span>{' '}
-            {activeCategory ? `${activeCategory} deal${filtered.length !== 1 ? 's' : ''}` : `deal${filtered.length !== 1 ? 's' : ''} available`}
+            {isLoading ? (
+              <span className="text-slate-400">Searching…</span>
+            ) : (
+              <>
+                <span className="font-semibold text-slate-900">{data?.total ?? filtered.length}</span>{' '}
+                {q
+                  ? <>result{filtered.length !== 1 ? 's' : ''} for <strong className="text-slate-700">"{q}"</strong></>
+                  : activeCategory
+                  ? `${activeCategory} deal${filtered.length !== 1 ? 's' : ''}`
+                  : `deal${filtered.length !== 1 ? 's' : ''} available`}
+              </>
+            )}
           </p>
+          {(q || activeCategory) && (
+            <button
+              onClick={() => { setSearchInput(''); setActiveCategory(''); }}
+              className="text-xs text-maple-500 hover:underline font-medium"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
 
-        {filtered.length === 0 ? (
+        {!isLoading && filtered.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-4xl mb-3">😔</div>
-            <p className="text-slate-600 font-medium">No {activeCategory} deals right now.</p>
+            <div className="text-4xl mb-3">🔍</div>
+            <p className="text-slate-600 font-medium">No results found{q ? ` for "${q}"` : ''}.</p>
             <button
-              onClick={() => setActiveCategory('')}
+              onClick={() => { setSearchInput(''); setActiveCategory(''); }}
               className="mt-3 text-sm text-maple-500 hover:underline font-medium"
             >
-              View all deals
+              Clear search
             </button>
           </div>
         ) : (
