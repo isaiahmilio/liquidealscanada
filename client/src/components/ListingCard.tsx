@@ -4,11 +4,12 @@ import type { PublicListing } from '../lib/types';
 
 export function ListingCard({ listing }: { listing: PublicListing }) {
   const savings = savingsPercent(listing.retailPriceCents, listing.listedPriceCents);
+  const isHot = savings >= 40;
 
   return (
     <Link
       to={`/listings/${listing.id}`}
-      className="group flex flex-col bg-white rounded-xl border border-slate-200 hover:border-brand-400 hover:shadow-md transition-all duration-200 overflow-hidden"
+      className="group flex flex-col bg-white rounded-xl border border-slate-200 hover:border-maple-300 hover:shadow-lg transition-all duration-200 overflow-hidden"
     >
       <div className="aspect-square bg-slate-100 overflow-hidden relative">
         {listing.photoUrl ? (
@@ -26,19 +27,30 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
             📦
           </div>
         )}
+
+        {/* Savings badge */}
         {savings > 0 && (
-          <span className="absolute top-2 left-2 bg-brand-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-sm">
+          <span className={`absolute top-2 left-2 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-sm ${
+            isHot ? 'bg-maple-500' : 'bg-brand-600'
+          }`}>
             -{savings}%
+          </span>
+        )}
+
+        {/* HOT badge */}
+        {isHot && (
+          <span className="absolute top-2 right-2 bg-amber-400 text-amber-900 text-xs font-extrabold px-2 py-0.5 rounded-lg shadow-sm tracking-wide">
+            HOT
           </span>
         )}
       </div>
 
       <div className="p-3 flex flex-col gap-1">
-        <h3 className="text-sm font-semibold text-slate-900 truncate leading-snug">
+        <h3 className="text-sm font-semibold text-slate-900 line-clamp-2 leading-snug">
           {listing.title}
         </h3>
 
-        <div className="flex items-baseline gap-2">
+        <div className="flex items-baseline gap-2 mt-0.5">
           <span className="text-lg font-bold text-slate-900">
             {formatCents(listing.listedPriceCents)}
           </span>
@@ -50,7 +62,7 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
         </div>
 
         {listing.category && (
-          <span className="self-start text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+          <span className="self-start text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full mt-0.5">
             {listing.category}
           </span>
         )}

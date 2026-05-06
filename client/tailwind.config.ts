@@ -12,6 +12,13 @@ export default {
           600: '#059669',
           700: '#047857',
         },
+        maple: {
+          50:  '#fef2f2',
+          100: '#fddede',
+          500: '#C0272D',
+          600: '#A82025',
+          700: '#8F1A1E',
+        },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

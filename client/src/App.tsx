@@ -10,9 +10,22 @@ import { EditListing } from './routes/seller/EditListing';
 import { RequireSeller } from './components/RequireSeller';
 import { useAuth } from './lib/auth';
 
+const TICKER_ITEMS = [
+  '🍁 New deals added daily',
+  '💰 Up to 90% off retail',
+  '🇨🇦 Canadian sellers',
+  '🏷️ Liquidation prices',
+  '📦 Electronics, Kitchen, Gaming & more',
+  '🍁 New deals added daily',
+  '💰 Up to 90% off retail',
+  '🇨🇦 Canadian sellers',
+  '🏷️ Liquidation prices',
+  '📦 Electronics, Kitchen, Gaming & more',
+];
+
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `text-sm font-medium transition-colors ${
-    isActive ? 'text-brand-700' : 'text-slate-600 hover:text-slate-900'
+    isActive ? 'text-maple-500' : 'text-slate-600 hover:text-slate-900'
   }`;
 
 export function App() {
@@ -27,13 +40,22 @@ export function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50">
+      {/* Scrolling ticker */}
+      <div className="bg-maple-500 text-white text-xs font-medium py-1.5 overflow-hidden whitespace-nowrap">
+        <div className="flex animate-marquee gap-0">
+          {TICKER_ITEMS.map((item, i) => (
+            <span key={i} className="px-8">{item}</span>
+          ))}
+        </div>
+      </div>
+
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-sm">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           <Link to="/" className="flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-xl">🏷️</span>
-            <span className="font-bold text-lg">
-              <span className="text-brand-700">LiquiDeals</span>
-              <span className="text-slate-700">Canada</span>
+            <span className="text-xl">🍁</span>
+            <span className="font-bold text-lg tracking-tight">
+              <span className="text-maple-500">LiquiDeals</span>
+              <span className="text-slate-800">Canada</span>
             </span>
           </Link>
 
@@ -51,7 +73,7 @@ export function App() {
                 {isSeller && (
                   <Link
                     to="/seller/new"
-                    className="hidden sm:inline-flex items-center gap-1.5 bg-brand-600 text-white text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-brand-700 active:scale-95 transition shadow-sm"
+                    className="hidden sm:inline-flex items-center gap-1.5 bg-maple-500 text-white text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-maple-600 active:scale-95 transition shadow-sm"
                   >
                     + Sell item
                   </Link>
@@ -73,7 +95,7 @@ export function App() {
                 </Link>
                 <Link
                   to="/signup"
-                  className="bg-brand-600 text-white text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-brand-700 active:scale-95 transition shadow-sm"
+                  className="bg-maple-500 text-white text-sm font-medium px-3.5 py-2 rounded-lg hover:bg-maple-600 active:scale-95 transition shadow-sm"
                 >
                   Sign up free
                 </Link>
@@ -83,32 +105,55 @@ export function App() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
+      <main className="flex-1 w-full">
         <Routes>
           <Route path="/" element={<Browse />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/listings/:id" element={<ListingDetail />} />
+          <Route path="/search" element={
+            <div className="max-w-6xl mx-auto px-4 py-8"><Search /></div>
+          } />
+          <Route path="/listings/:id" element={
+            <div className="max-w-6xl mx-auto px-4 py-8"><ListingDetail /></div>
+          } />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/seller" element={<RequireSeller><SellerDashboard /></RequireSeller>} />
-          <Route path="/seller/new" element={<RequireSeller><NewListing /></RequireSeller>} />
-          <Route path="/seller/listings/:id/edit" element={<RequireSeller><EditListing /></RequireSeller>} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="/seller" element={
+            <div className="max-w-6xl mx-auto px-4 py-8">
+              <RequireSeller><SellerDashboard /></RequireSeller>
+            </div>
+          } />
+          <Route path="/seller/new" element={
+            <div className="max-w-6xl mx-auto px-4 py-8">
+              <RequireSeller><NewListing /></RequireSeller>
+            </div>
+          } />
+          <Route path="/seller/listings/:id/edit" element={
+            <div className="max-w-6xl mx-auto px-4 py-8">
+              <RequireSeller><EditListing /></RequireSeller>
+            </div>
+          } />
+          <Route path="*" element={
+            <div className="max-w-6xl mx-auto px-4 py-8"><NotFound /></div>
+          } />
         </Routes>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-8 mt-8">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <span>🏷️</span>
-            <span className="font-semibold text-slate-600">LiquiDealsCanada</span>
-            <span>— Buy &amp; sell liquidation goods across Canada.</span>
+      <footer className="border-t border-slate-200 bg-white mt-8">
+        <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col items-center sm:items-start gap-1">
+            <div className="flex items-center gap-1.5">
+              <span>🍁</span>
+              <span className="font-bold text-slate-800">LiquiDealsCanada</span>
+            </div>
+            <p className="text-sm text-slate-500">Buy liquidation goods for up to 90% off</p>
           </div>
-          <div className="flex gap-5">
-            <Link to="/" className="hover:text-slate-700 transition-colors">Browse</Link>
-            <Link to="/search" className="hover:text-slate-700 transition-colors">Search</Link>
-            <Link to="/signup" className="hover:text-slate-700 transition-colors">Sell with us</Link>
+          <div className="flex gap-6 text-sm text-slate-400">
+            <Link to="/" className="hover:text-maple-500 transition-colors">Browse</Link>
+            <Link to="/search" className="hover:text-maple-500 transition-colors">Search</Link>
+            <Link to="/signup" className="hover:text-maple-500 transition-colors">Sell with us</Link>
           </div>
+        </div>
+        <div className="border-t border-slate-100 py-3 text-center text-xs text-slate-400">
+          🇨🇦 Proudly serving Canadians from coast to coast
         </div>
       </footer>
     </div>
@@ -126,7 +171,7 @@ function NotFound() {
       </p>
       <button
         onClick={() => navigate(-1)}
-        className="bg-brand-600 text-white px-5 py-2.5 rounded-lg hover:bg-brand-700 font-medium transition active:scale-95 shadow-sm"
+        className="bg-maple-500 text-white px-5 py-2.5 rounded-lg hover:bg-maple-600 font-medium transition active:scale-95 shadow-sm"
       >
         Go back
       </button>

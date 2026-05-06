@@ -34,7 +34,8 @@
       "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"C:\\\\Program Files\\\\nodejs\\\\node.exe\" \"C:\\\\Program Files\\\\nodejs\\\\node_modules\\\\@railway\\\\cli\\\\bin\\\\railway.js\" whoami)",
       "PowerShell(cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" whoami)",
       "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" whoami)",
-      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" login --browserless)"
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; cd \"C:\\\\.programs\\\\liquidealscanada\"; & \"$env:APPDATA\\\\npm\\\\railway.cmd\" login --browserless)",
+      "PowerShell(git commit *)"
     ]
   }
 }
