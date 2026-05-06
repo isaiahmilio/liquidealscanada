@@ -78,9 +78,27 @@ export function Login() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-4">
-          Try demo: <span className="font-mono">demo@liquidealscanada.test</span> / <span className="font-mono">demopass123</span>
-        </p>
+        <div className="mt-4 space-y-2">
+          <p className="text-center text-xs text-slate-400">Try a demo account:</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setEmail('buyer@liquidealscanada.test'); setPassword('buyerpass123'); }}
+              className="flex-1 text-xs border border-slate-200 rounded-xl py-2 px-3 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition text-left"
+            >
+              <span className="font-semibold block text-slate-700">Buyer demo</span>
+              <span className="text-slate-400">Browse &amp; save deals</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEmail('demo@liquidealscanada.test'); setPassword('demopass123'); }}
+              className="flex-1 text-xs border border-slate-200 rounded-xl py-2 px-3 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition text-left"
+            >
+              <span className="font-semibold block text-slate-700">Seller demo</span>
+              <span className="text-slate-400">List &amp; manage items</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
