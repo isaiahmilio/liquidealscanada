@@ -42,11 +42,18 @@ interface ListingWithSources {
   createdAt: Date;
   updatedAt: Date;
   priceSources?: { retailer: string; priceCents: number; url: string | null }[];
+  photos?: { id: string; photoPath: string; position: number }[];
 }
 
-// Strips seller-private fields when the viewer is not the owner.
 function serializeListing(listing: ListingWithSources, viewerId: string | undefined) {
   const isOwner = viewerId && viewerId === listing.sellerId;
+
+  // Build unified photos array: primary photo first, then extras ordered by position.
+  const allPhotos: { id: string; url: string }[] = [];
+  if (listing.photoPath) allPhotos.push({ id: 'primary', url: publicUrl(listing.photoPath) });
+  const extras = (listing.photos ?? []).sort((a, b) => a.position - b.position);
+  for (const p of extras) allPhotos.push({ id: p.id, url: publicUrl(p.photoPath) });
+
   const base = {
     id: listing.id,
     sellerId: listing.sellerId,
@@ -54,6 +61,7 @@ function serializeListing(listing: ListingWithSources, viewerId: string | undefi
     description: listing.description,
     category: listing.category,
     photoUrl: listing.photoPath ? publicUrl(listing.photoPath) : null,
+    photos: allPhotos,
     retailPriceCents: listing.retailPriceCents,
     listedPriceCents: listing.listedPriceCents,
     identifiedProduct: listing.identifiedProduct,
@@ -64,11 +72,7 @@ function serializeListing(listing: ListingWithSources, viewerId: string | undefi
     priceSources: listing.priceSources ?? [],
   };
   if (!isOwner) return base;
-  return {
-    ...base,
-    suggestedPriceCents: listing.suggestedPriceCents,
-    costCents: listing.costCents,
-  };
+  return { ...base, suggestedPriceCents: listing.suggestedPriceCents, costCents: listing.costCents };
 }
 
 // POST /api/listings — multipart image upload. Creates DRAFT and runs AI pipeline.
@@ -137,6 +141,7 @@ listingsRouter.get('/', async (req, res, next) => {
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * PAGE_SIZE,
         take: PAGE_SIZE,
+        include: { photos: true },
       }),
       prisma.listing.count({ where }),
     ]);
@@ -160,7 +165,7 @@ sellerListingsRouter.get('/listings', requireAuth, requireSeller, async (req, re
     const items = await prisma.listing.findMany({
       where: { sellerId: req.user!.id },
       orderBy: { updatedAt: 'desc' },
-      include: { priceSources: true },
+      include: { priceSources: true, photos: true },
     });
     res.json({ listings: items.map((l) => serializeListing(l as ListingWithSources, req.user!.id)) });
   } catch (err) {
@@ -168,8 +173,8 @@ sellerListingsRouter.get('/listings', requireAuth, requireSeller, async (req, re
   }
 });
 
-// POST /api/seller/listings/manual — create a listing manually with optional image, no AI.
-sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload.single('image'), async (req, res, next) => {
+// POST /api/seller/listings/manual — create a listing manually with optional images, no AI.
+sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload.array('images', 10), async (req, res, next) => {
   try {
     const { title, description, category, condition, costCents, retailPriceCents, listedPriceCents } = req.body;
     if (!title || typeof title !== 'string' || !title.trim()) {
@@ -179,7 +184,8 @@ sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload
     const listed = Math.max(0, Math.round(Number(listedPriceCents) || 0));
     const cost   = Math.max(0, Math.round(Number(costCents)        || 0));
 
-    const stored = req.file ? await putImage(req.file.buffer, req.file.originalname) : null;
+    const files = (req.files as Express.Multer.File[]) ?? [];
+    const [primary, ...extras] = await Promise.all(files.map((f) => putImage(f.buffer, f.originalname)));
 
     const listing = await prisma.listing.create({
       data: {
@@ -192,9 +198,12 @@ sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload
         retailPriceCents:    retail,
         suggestedPriceCents: Math.round(retail * 0.6),
         listedPriceCents:    listed,
-        photoPath:           stored?.photoPath ?? null,
+        photoPath:           primary?.photoPath ?? null,
+        photos: extras.length > 0 ? {
+          create: extras.map((s, i) => ({ photoPath: s.photoPath, position: i })),
+        } : undefined,
       },
-      include: { priceSources: true },
+      include: { priceSources: true, photos: true },
     });
     return res.status(201).json({ listing: serializeListing(listing as ListingWithSources, req.user!.id) });
   } catch (err) {
@@ -207,7 +216,7 @@ listingsRouter.get('/:id', async (req, res, next) => {
   try {
     const listing = await prisma.listing.findUnique({
       where: { id: req.params.id },
-      include: { priceSources: true },
+      include: { priceSources: true, photos: true },
     });
     if (!listing) return res.status(404).json({ error: 'Not found' });
 
@@ -234,7 +243,7 @@ listingsRouter.patch('/:id', requireAuth, async (req, res, next) => {
     const updated = await prisma.listing.update({
       where: { id: req.params.id },
       data: parsed.data,
-      include: { priceSources: true },
+      include: { priceSources: true, photos: true },
     });
     res.json({ listing: serializeListing(updated as ListingWithSources, req.user!.id) });
   } catch (err) {
@@ -252,6 +261,45 @@ listingsRouter.delete('/:id', requireAuth, async (req, res, next) => {
     await prisma.listing.update({
       where: { id: req.params.id },
       data: { status: 'REMOVED' },
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/listings/:id/photos — add an extra photo to an existing listing.
+listingsRouter.post('/:id/photos', requireAuth, requireSeller, upload.single('image'), async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'image file required' });
+
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.id } });
+    if (!listing) return res.status(404).json({ error: 'Not found' });
+    if (listing.sellerId !== req.user!.id) return res.status(403).json({ error: 'Not your listing' });
+
+    const count = await prisma.listingPhoto.count({ where: { listingId: listing.id } });
+    if (count >= 9) return res.status(400).json({ error: 'Maximum 10 photos per listing' });
+
+    const stored = await putImage(req.file.buffer, req.file.originalname);
+    const photo = await prisma.listingPhoto.create({
+      data: { listingId: listing.id, photoPath: stored.photoPath, position: count },
+    });
+
+    res.status(201).json({ photo: { id: photo.id, url: publicUrl(photo.photoPath), position: photo.position } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/listings/:id/photos/:photoId — remove an extra photo.
+listingsRouter.delete('/:id/photos/:photoId', requireAuth, async (req, res, next) => {
+  try {
+    const listing = await prisma.listing.findUnique({ where: { id: req.params.id } });
+    if (!listing) return res.status(404).json({ error: 'Not found' });
+    if (listing.sellerId !== req.user!.id) return res.status(403).json({ error: 'Not your listing' });
+
+    await prisma.listingPhoto.deleteMany({
+      where: { id: req.params.photoId, listingId: listing.id },
     });
     res.json({ ok: true });
   } catch (err) {

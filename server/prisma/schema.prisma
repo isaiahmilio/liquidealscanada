@@ -53,9 +53,20 @@ model Listing {
   seller              User          @relation(fields: [sellerId], references: [id])
   priceSources        PriceSource[]
   favoritedBy         Favorite[]
+  photos              ListingPhoto[]
 
   @@index([status, createdAt])
   @@index([sellerId])
+}
+
+model ListingPhoto {
+  id        String   @id @default(cuid())
+  listingId String
+  photoPath String
+  position  Int      @default(0)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
 }
 
 model Favorite {

@@ -6,6 +6,7 @@ import type { PublicListing, OwnerListing } from '../lib/types';
 import { useAuth } from '../lib/auth';
 import { ProfitMarginBadge } from '../components/ProfitMarginBadge';
 import { FavoriteButton } from '../components/FavoriteButton';
+import { PhotoGallery } from '../components/PhotoGallery';
 
 export function ListingDetail() {
   const { id } = useParams<{ id: string }>();
@@ -60,20 +61,7 @@ export function ListingDetail() {
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-          {listing.photoUrl ? (
-            <img
-              src={listing.photoUrl}
-              alt={listing.title}
-              className="w-full h-auto object-cover"
-              onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.3'; }}
-            />
-          ) : (
-            <div className="w-full aspect-square flex items-center justify-center text-slate-300 text-7xl bg-slate-50">
-              📦
-            </div>
-          )}
-        </div>
+        <PhotoGallery photos={listing.photos ?? []} alt={listing.title} />
 
         <div className="flex flex-col gap-5">
           <div>

@@ -14,8 +14,8 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
   const nav = useNavigate();
 
   const [title, setTitle]             = useState('');
-  const [photo, setPhoto]             = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photos, setPhotos]           = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [condition, setCondition]     = useState<Condition>('');
   const [quality, setQuality]         = useState(8);
   const [description, setDescription] = useState('');
@@ -32,9 +32,16 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
 
   const canPublish = title.trim().length > 0 && listedCents > 0;
 
-  function selectPhoto(file: File) {
-    setPhoto(file);
-    setPhotoPreview(URL.createObjectURL(file));
+  function addPhotos(files: File[]) {
+    const next = [...photos, ...files].slice(0, 10);
+    setPhotos(next);
+    setPhotoPreviews(next.map((f) => URL.createObjectURL(f)));
+  }
+
+  function removePhoto(i: number) {
+    const next = photos.filter((_, idx) => idx !== i);
+    setPhotos(next);
+    setPhotoPreviews(next.map((f) => URL.createObjectURL(f)));
   }
 
   function conditionText() {
@@ -56,7 +63,7 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
       fd.append('costCents',        String(costCents));
       fd.append('retailPriceCents', String(retailCents));
       fd.append('listedPriceCents', String(listedCents));
-      if (photo) fd.append('image', photo);
+      for (const photo of photos) fd.append('images', photo);
 
       const res = await api.post<{ listing: OwnerListing }>('/api/seller/listings/manual', fd);
       await api.patch(`/api/listings/${res.listing.id}`, { status: 'LIVE' });
@@ -91,19 +98,25 @@ export function ManualListing({ onBack }: { onBack: () => void }) {
         </label>
 
         <div>
-          <span className="text-sm font-medium text-slate-700">Photo <span className="text-slate-400 font-normal">(optional)</span></span>
-          <div className="mt-1.5">
-            {photoPreview ? (
-              <div className="relative">
-                <img src={photoPreview} alt="preview" className="w-full max-h-52 object-contain rounded-xl border border-slate-200 bg-slate-50" />
-                <button
-                  type="button"
-                  onClick={() => { setPhoto(null); setPhotoPreview(null); }}
-                  className="absolute top-2 right-2 bg-white border border-slate-300 text-slate-600 rounded-full w-7 h-7 flex items-center justify-center text-sm hover:bg-slate-50 shadow-sm"
-                >✕</button>
+          <span className="text-sm font-medium text-slate-700">Photos <span className="text-slate-400 font-normal">(optional, up to 10)</span></span>
+          <div className="mt-1.5 space-y-2">
+            {photoPreviews.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {photoPreviews.map((src, i) => (
+                  <div key={i} className="relative">
+                    <img src={src} alt="" className="w-20 h-20 object-cover rounded-xl border border-slate-200 bg-slate-50" />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(i)}
+                      className="absolute -top-1.5 -right-1.5 bg-white border border-slate-300 text-slate-600 rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-slate-50 shadow-sm leading-none"
+                    >✕</button>
+                    {i === 0 && <span className="absolute bottom-1 left-1 text-[9px] font-bold bg-maple-500 text-white rounded px-1">Main</span>}
+                  </div>
+                ))}
               </div>
-            ) : (
-              <ImageDropzone onFileSelected={selectPhoto} />
+            )}
+            {photos.length < 10 && (
+              <ImageDropzone onFileSelected={(f) => addPhotos([f])} />
             )}
           </div>
         </div>

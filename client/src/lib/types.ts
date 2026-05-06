@@ -6,6 +6,11 @@ export interface PriceSource {
   url: string | null;
 }
 
+export interface ListingPhoto {
+  id: string;
+  url: string;
+}
+
 export interface PublicListing {
   id: string;
   sellerId: string;
@@ -13,6 +18,7 @@ export interface PublicListing {
   description: string | null;
   category: string | null;
   photoUrl: string | null;
+  photos: ListingPhoto[];
   retailPriceCents: number;
   listedPriceCents: number;
   identifiedProduct: string | null;
