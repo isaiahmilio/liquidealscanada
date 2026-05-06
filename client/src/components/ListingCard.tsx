@@ -3,9 +3,12 @@ import { formatCents, savingsPercent } from '../lib/pricing';
 import type { PublicListing } from '../lib/types';
 import { FavoriteButton } from './FavoriteButton';
 
+const HOURS_48 = 48 * 60 * 60 * 1000;
+
 export function ListingCard({ listing }: { listing: PublicListing }) {
   const savings = savingsPercent(listing.retailPriceCents, listing.listedPriceCents);
   const isHot = savings >= 40;
+  const isNew = Date.now() - new Date(listing.createdAt).getTime() < HOURS_48;
 
   return (
     <Link
@@ -42,6 +45,13 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
         {isHot && (
           <span className="absolute top-2 right-2 bg-amber-400 text-amber-900 text-xs font-extrabold px-2 py-0.5 rounded-lg shadow-sm tracking-wide">
             HOT
+          </span>
+        )}
+
+        {/* Recently added badge */}
+        {isNew && (
+          <span className="absolute bottom-2 left-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm tracking-wide uppercase">
+            New
           </span>
         )}
 
