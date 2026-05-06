@@ -95,7 +95,16 @@ export async function runSeed() {
       seller = await prisma.user.create({
         data: { email, passwordHash: await hashPassword('demopass123'), role: 'BOTH' },
       });
-      console.log('[seed] created demo user');
+      console.log('[seed] created demo seller user');
+    }
+
+    const buyerEmail = 'buyer@liquidealscanada.test';
+    const buyerExists = await prisma.user.findUnique({ where: { email: buyerEmail } });
+    if (!buyerExists) {
+      await prisma.user.create({
+        data: { email: buyerEmail, passwordHash: await hashPassword('buyerpass123'), role: 'BUYER' },
+      });
+      console.log('[seed] created demo buyer user');
     }
 
     let created = 0;
