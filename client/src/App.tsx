@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, Link, NavLink, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Browse } from './routes/Browse';
 import { ListingDetail } from './routes/ListingDetail';
 import { Search } from './routes/Search';
@@ -33,6 +33,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export function App() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const isSeller = user?.role === 'SELLER' || user?.role === 'BOTH';
 
   function handleLogout() {
@@ -112,7 +113,7 @@ export function App() {
         </div>
       </header>
 
-      <main className="flex-1 w-full">
+      <main key={location.pathname} className="flex-1 w-full animate-page-enter">
         <Routes>
           <Route path="/" element={<Browse />} />
           <Route path="/search" element={
