@@ -56,6 +56,7 @@ model Listing {
   priceSources        PriceSource[]
   favoritedBy         Favorite[]
   photos              ListingPhoto[]
+  views               ListingView[]
 
   @@index([status, createdAt])
   @@index([sellerId])
@@ -100,4 +101,15 @@ model Image {
   data      Bytes
   mimeType  String   @default("image/jpeg")
   createdAt DateTime @default(now())
+}
+
+model ListingView {
+  id        String   @id @default(cuid())
+  listingId String
+  viewerKey String   // userId for logged-in users, anonymous cookie ID for guests
+  viewedAt  DateTime @default(now())
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, viewerKey])
+  @@index([listingId])
 }

@@ -232,8 +232,22 @@ listingsRouter.get('/:id', async (req, res, next) => {
     const isOwner = req.user?.id === listing.sellerId;
     if (!isOwner && listing.status !== 'LIVE') return res.status(404).json({ error: 'Not found' });
 
-    // Increment view count in the background — don't await so response is not delayed.
-    prisma.listing.update({ where: { id: listing.id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
+    // Count only unique views. viewerKey = userId for logged-in users, else a persistent guest cookie.
+    let viewerKey = req.user?.id;
+    if (!viewerKey) {
+      viewerKey = req.cookies['vid'] as string | undefined;
+      if (!viewerKey) {
+        const { randomUUID } = await import('node:crypto');
+        viewerKey = randomUUID();
+        res.cookie('vid', viewerKey, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'lax' });
+      }
+    }
+    const key = viewerKey;
+    prisma.listingView.createMany({ data: [{ listingId: listing.id, viewerKey: key }], skipDuplicates: true })
+      .then(({ count }) => {
+        if (count > 0) prisma.listing.update({ where: { id: listing.id }, data: { viewCount: { increment: 1 } } }).catch(() => {});
+      })
+      .catch(() => {});
 
     res.json({ listing: serializeListing(listing as ListingWithSources, req.user?.id) });
   } catch (err) {
