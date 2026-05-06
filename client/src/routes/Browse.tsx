@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
@@ -32,24 +32,15 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 
 export function Browse() {
   const [activeCategory, setActiveCategory] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [q, setQ] = useState('');
   const [sort, setSort] = useState<SortOption>('newest');
 
-  // Debounce: wait 350ms after typing stops before hitting the server
-  useEffect(() => {
-    const t = setTimeout(() => setQ(searchInput.trim()), 350);
-    return () => clearTimeout(t);
-  }, [searchInput]);
-
   const params = new URLSearchParams();
-  if (q) params.set('q', q);
   if (activeCategory) params.set('category', activeCategory);
   if (sort !== 'newest') params.set('sort', sort);
   const qs = params.toString();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['listings', 'browse', q, activeCategory, sort],
+    queryKey: ['listings', 'browse', activeCategory, sort],
     queryFn: () => api.get<ListingsPage>(`/api/listings${qs ? `?${qs}` : ''}`),
   });
 
@@ -105,30 +96,6 @@ export function Browse() {
 
       <div id="deals" className="max-w-6xl mx-auto px-4 py-8">
 
-        {/* Search bar */}
-        <div className="relative mb-5">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search deals — e.g. AirPods, vacuum, gaming…"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-maple-500 focus:border-transparent placeholder:text-slate-400"
-          />
-          {searchInput && (
-            <button
-              onClick={() => setSearchInput('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          )}
-        </div>
-
         {/* Category filter pills */}
         <div className="flex gap-2 flex-wrap mb-3">
           {CATEGORIES.map((cat) => (
@@ -168,22 +135,18 @@ export function Browse() {
         {/* Results header */}
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-slate-500">
-            {isLoading ? (
-              <span className="text-slate-400">Searching…</span>
-            ) : (
+            {!isLoading && (
               <>
                 <span className="font-semibold text-slate-900">{data?.total ?? filtered.length}</span>{' '}
-                {q
-                  ? <>result{filtered.length !== 1 ? 's' : ''} for <strong className="text-slate-700">"{q}"</strong></>
-                  : activeCategory
+                {activeCategory
                   ? `${activeCategory} deal${filtered.length !== 1 ? 's' : ''}`
                   : `deal${filtered.length !== 1 ? 's' : ''} available`}
               </>
             )}
           </p>
-          {(q || activeCategory) && (
+          {activeCategory && (
             <button
-              onClick={() => { setSearchInput(''); setActiveCategory(''); setSort('newest'); }}
+              onClick={() => { setActiveCategory(''); setSort('newest'); }}
               className="text-xs text-maple-500 hover:underline font-medium"
             >
               Clear filters
@@ -195,11 +158,11 @@ export function Browse() {
           <div className="text-center py-16">
             <div className="text-4xl mb-3">{activeCategory ? '🏷️' : '🔍'}</div>
             <p className="text-slate-700 font-semibold text-lg mb-1">
-              {activeCategory ? `No ${activeCategory} listings yet` : `No results found${q ? ` for "${q}"` : ''}`}
+              {activeCategory ? `No ${activeCategory} listings yet` : 'No listings yet'}
             </p>
             <p className="text-slate-400 text-sm mb-5">Check back soon — new items are added regularly.</p>
             <button
-              onClick={() => { setSearchInput(''); setActiveCategory(''); setSort('newest'); }}
+              onClick={() => { setActiveCategory(''); setSort('newest'); }}
               className="inline-flex items-center gap-2 bg-maple-500 text-white font-semibold px-5 py-2.5 rounded-xl hover:bg-maple-600 active:scale-95 transition shadow-sm text-sm"
             >
               🏷️ Browse all deals

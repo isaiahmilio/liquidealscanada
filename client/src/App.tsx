@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Browse } from './routes/Browse';
 import { ListingDetail } from './routes/ListingDetail';
-import { Search } from './routes/Search';
 import { Login } from './routes/Login';
 import { Signup } from './routes/Signup';
 import { SellerDashboard } from './routes/seller/Dashboard';
@@ -64,7 +63,6 @@ export function App() {
 
           <nav className="flex items-center gap-5">
             <NavLink to="/" end className={navLinkClass}>Browse</NavLink>
-            <NavLink to="/search" className={navLinkClass}>Search</NavLink>
             {user && (
               <NavLink to="/saved" className={navLinkClass}>
                 Saved
@@ -116,9 +114,6 @@ export function App() {
       <main key={location.pathname} className="flex-1 w-full animate-page-enter pb-16 md:pb-0">
         <Routes>
           <Route path="/" element={<Browse />} />
-          <Route path="/search" element={
-            <div className="max-w-6xl mx-auto px-4 py-8"><Search /></div>
-          } />
           <Route path="/listings/:id" element={
             <div className="max-w-6xl mx-auto px-4 py-8"><ListingDetail /></div>
           } />
@@ -162,7 +157,6 @@ export function App() {
           </div>
           <div className="flex gap-6 text-sm text-slate-400">
             <Link to="/" className="hover:text-maple-500 transition-colors">Browse</Link>
-            <Link to="/search" className="hover:text-maple-500 transition-colors">Search</Link>
           </div>
         </div>
         <div className="border-t border-slate-100 py-3 text-center text-xs text-slate-400">
@@ -218,9 +212,6 @@ function MobileNav() {
     <nav className="fixed bottom-0 inset-x-0 z-50 md:hidden bg-white border-t border-slate-200 shadow-[0_-1px_8px_rgba(0,0,0,0.06)] flex items-center justify-around h-16">
       {tab('/', true, 'Browse',
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      )}
-      {tab('/search', false, 'Search',
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
       )}
       {user
         ? tab('/saved', false, 'Saved',
