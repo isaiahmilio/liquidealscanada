@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Routes, Route, Link, NavLink, useNavigate } from 'react-router-dom';
 import { Browse } from './routes/Browse';
 import { ListingDetail } from './routes/ListingDetail';
@@ -146,6 +147,8 @@ export function App() {
         </Routes>
       </main>
 
+      <BackToTop />
+
       <footer className="border-t border-slate-200 bg-white mt-8">
         <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col items-center sm:items-start gap-1">
@@ -165,6 +168,28 @@ export function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function BackToTop() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    function onScroll() { setVisible(window.scrollY > 400); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      aria-label="Back to top"
+      className={`fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full bg-maple-500 text-white shadow-lg flex items-center justify-center hover:bg-maple-600 active:scale-95 transition-all duration-200 ${
+        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+      }`}
+    >
+      ↑
+    </button>
   );
 }
 
