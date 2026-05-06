@@ -157,7 +157,7 @@ export function ListingDetail() {
               <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide">Seller view — only visible to you</p>
               <div className="flex flex-wrap gap-4 text-sm text-slate-700">
                 <span>Cost: <strong>{formatCents(ownerListing.costCents)}</strong></span>
-                <span>Suggested: <strong>{formatCents(ownerListing.suggestedPriceCents)}</strong></span>
+                <span>Listed: <strong>{formatCents(ownerListing.listedPriceCents)}</strong></span>
                 <ProfitMarginBadge listedCents={ownerListing.listedPriceCents} costCents={ownerListing.costCents} />
               </div>
               {isOwner && (
