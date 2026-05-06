@@ -155,6 +155,11 @@ export function EditListing() {
             <div className="relative">
               <img src={listing.photoUrl} alt="" className="w-20 h-20 object-cover rounded-xl border border-slate-200" />
               <span className="absolute bottom-1 left-1 text-[9px] font-bold bg-maple-500 text-white rounded px-1">Main</span>
+              <button
+                type="button"
+                onClick={() => deletePhoto('primary')}
+                className="absolute -top-1.5 -right-1.5 bg-white border border-slate-300 text-slate-600 rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-50 hover:text-red-600 shadow-sm leading-none"
+              >✕</button>
             </div>
           )}
           {(listing.photos ?? []).filter(p => p.id !== 'primary').map((p) => (

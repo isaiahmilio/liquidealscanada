@@ -318,16 +318,21 @@ listingsRouter.post('/:id/photos', requireAuth, requireSeller, upload.single('im
   }
 });
 
-// DELETE /api/listings/:id/photos/:photoId — remove an extra photo.
+// DELETE /api/listings/:id/photos/:photoId — remove a photo.
+// photoId === 'primary' clears the main listing photo; otherwise deletes from ListingPhoto.
 listingsRouter.delete('/:id/photos/:photoId', requireAuth, async (req, res, next) => {
   try {
     const listing = await prisma.listing.findUnique({ where: { id: req.params.id } });
     if (!listing) return res.status(404).json({ error: 'Not found' });
     if (listing.sellerId !== req.user!.id) return res.status(403).json({ error: 'Not your listing' });
 
-    await prisma.listingPhoto.deleteMany({
-      where: { id: req.params.photoId, listingId: listing.id },
-    });
+    if (req.params.photoId === 'primary') {
+      await prisma.listing.update({ where: { id: listing.id }, data: { photoPath: null } });
+    } else {
+      await prisma.listingPhoto.deleteMany({
+        where: { id: req.params.photoId, listingId: listing.id },
+      });
+    }
     res.json({ ok: true });
   } catch (err) {
     next(err);
