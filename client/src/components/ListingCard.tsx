@@ -55,7 +55,7 @@ export function ListingCard({ listing }: { listing: PublicListing }) {
           </span>
         )}
 
-        <FavoriteButton listingId={listing.id} className="absolute bottom-2 right-2" />
+        <FavoriteButton listingId={listing.id} className="absolute bottom-2 right-2 z-10" />
 
         {/* Hover preview — desktop only */}
         {(listing.condition || listing.description) && (
