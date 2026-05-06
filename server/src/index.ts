@@ -16,6 +16,7 @@ import { attachUser } from './middleware/requireAuth.js';
 import { runSeed } from './lib/seed.js';
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT ?? 4000);
 const IS_PROD = process.env.NODE_ENV === 'production';
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
