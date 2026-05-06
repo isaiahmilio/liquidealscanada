@@ -89,9 +89,9 @@ export function Browse() {
 
   return (
     <div>
-      <HeroBanner total={data.total} />
+      <HeroBanner total={data.total} onScrollToDeals={() => document.getElementById('deals')?.scrollIntoView({ behavior: 'smooth' })} />
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div id="deals" className="max-w-6xl mx-auto px-4 py-8">
 
         {/* Search bar */}
         <div className="relative mb-5">
@@ -184,7 +184,7 @@ export function Browse() {
   );
 }
 
-function HeroBanner({ total }: { total: number | null }) {
+function HeroBanner({ total, onScrollToDeals }: { total: number | null; onScrollToDeals?: () => void }) {
   return (
     <div className="relative bg-maple-500 overflow-hidden">
       {/* Maple leaf watermark */}
@@ -205,9 +205,12 @@ function HeroBanner({ total }: { total: number | null }) {
           </p>
           <div className="flex flex-wrap gap-3">
             {total !== null && total > 0 && (
-              <span className="inline-flex items-center gap-2 bg-white text-maple-600 font-bold px-5 py-2.5 rounded-xl text-sm shadow-md">
-                🏷️ {total} deal{total !== 1 ? 's' : ''} available now
-              </span>
+              <button
+                onClick={onScrollToDeals}
+                className="inline-flex items-center gap-2 bg-white text-maple-600 font-bold px-5 py-2.5 rounded-xl text-sm shadow-md hover:bg-maple-50 active:scale-95 transition-all"
+              >
+                🏷️ {total} deal{total !== 1 ? 's' : ''} available now ↓
+              </button>
             )}
           </div>
         </div>
