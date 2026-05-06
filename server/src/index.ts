@@ -5,6 +5,7 @@ import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import rateLimit from 'express-rate-limit';
+import { prisma } from './lib/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
@@ -21,7 +22,6 @@ app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT ?? 4000);
 const IS_PROD = process.env.NODE_ENV === 'production';
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN ?? 'http://localhost:5173';
-const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR ?? './uploads');
 
 // In production the React app is served from this same server (same origin),
 // so CORS is only needed in development.
@@ -30,7 +30,18 @@ app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 app.use(attachUser);
 
-app.use('/uploads', express.static(UPLOAD_DIR));
+// Serve images stored as DB blobs — no filesystem needed.
+app.get('/api/images/:id', async (req, res) => {
+  try {
+    const image = await prisma.image.findUnique({ where: { id: req.params.id } });
+    if (!image) return res.status(404).end();
+    res.setHeader('Content-Type', image.mimeType);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    res.send(image.data);
+  } catch {
+    res.status(500).end();
+  }
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() });
@@ -71,7 +82,6 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 app.listen(PORT, () => {
   console.log(`[server] listening on http://localhost:${PORT}`);
-  console.log(`[server] uploads served from ${UPLOAD_DIR}`);
   if (IS_PROD) console.log('[server] serving React build from client/dist');
   runSeed();
 });

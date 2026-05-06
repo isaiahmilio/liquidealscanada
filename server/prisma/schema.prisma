@@ -92,3 +92,10 @@ model PriceSource {
 
   @@index([listingId])
 }
+
+model Image {
+  id        String   @id @default(cuid())
+  data      Bytes
+  mimeType  String   @default("image/jpeg")
+  createdAt DateTime @default(now())
+}

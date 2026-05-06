@@ -81,7 +81,7 @@ listingsRouter.post('/', requireAuth, requireSeller, upload.single('image'), asy
     if (!req.file) return res.status(400).json({ error: 'image file required (field name: image)' });
     const sellerId = req.user!.id;
 
-    const stored = await putImage(req.file.buffer, req.file.originalname);
+    const stored = await putImage(req.file.buffer, req.file.originalname, req.file.mimetype);
 
     const productHint = typeof req.body.productHint === 'string' && req.body.productHint.trim()
       ? req.body.productHint.trim()
@@ -185,7 +185,7 @@ sellerListingsRouter.post('/listings/manual', requireAuth, requireSeller, upload
     const cost   = Math.max(0, Math.round(Number(costCents)        || 0));
 
     const files = (req.files as Express.Multer.File[]) ?? [];
-    const [primary, ...extras] = await Promise.all(files.map((f) => putImage(f.buffer, f.originalname)));
+    const [primary, ...extras] = await Promise.all(files.map((f) => putImage(f.buffer, f.originalname, f.mimetype)));
 
     const listing = await prisma.listing.create({
       data: {
@@ -280,7 +280,7 @@ listingsRouter.post('/:id/photos', requireAuth, requireSeller, upload.single('im
     const count = await prisma.listingPhoto.count({ where: { listingId: listing.id } });
     if (count >= 9) return res.status(400).json({ error: 'Maximum 10 photos per listing' });
 
-    const stored = await putImage(req.file.buffer, req.file.originalname);
+    const stored = await putImage(req.file.buffer, req.file.originalname, req.file.mimetype);
     const photo = await prisma.listingPhoto.create({
       data: { listingId: listing.id, photoPath: stored.photoPath, position: count },
     });
